@@ -1,0 +1,6 @@
+# Specifications for the standard library:
+# (Only included because of findlib-browser)
+requires = ""
+description = "CGI"
+version = "1.0"
+

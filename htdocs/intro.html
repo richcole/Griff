@@ -1,0 +1,128 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.72 [en] (X11; U; Linux 2.2.16-3 i686) [Netscape]">
+</head>
+<body text="#000000" bgcolor="#FFFFFF" link="#0000EE" vlink="#551A8B" alink="#FF0000">
+
+<center>
+<h1>
+Griff</h1></center>
+
+<h2>
+Introduction.</h2>
+The Griff project has the objective of creating a software framework to
+support the construction and utilisation of a knowlegde base.&nbsp; The
+knowledge base is constitued by a single triadic relation. A portion of
+the knowledge can be extracted using a query and that knowledge can be
+organised and visualised, either in a tabular form, or using a concept
+lattice arrising from denoting the query result as a power context family.
+<h1>
+Data Graphs.</h1>
+The basic idea of Griff is to provide a knowledge base using a single triadic
+relation, i.e. (V,E) where V is a set of vertices and E is a triadic relation
+defined on V.<br>
+<br>
+<BR>
+<center><img SRC="example.jpg" height=259 width=370>
+<br><br>
+Figure 1. Example Informatio Graph</center>
+
+<p>An example triadic relation is shown in Figure 1. The nodes are constituted
+by text strings and the relationships are shown by arrows. The arrows have
+a source, a destination and a relation-name. A linear form of the same
+information is shown below.
+<br>&nbsp;
+<blockquote><tt>Person:Richard contributes-to "Software Project":Griff
+has "GPL Library Licence".</tt></blockquote>
+
+<p><br>The syntax of the linear form follows the following rules.
+<br>"A:B" means that there is a relationship with A as the destination,
+<br>B as the source and "is-a" as the relation name. "A C B" means that
+there is a relationship from A to B called C.&nbsp; Here are some more
+complex examples:
+<br>&nbsp;
+<blockquote><tt>Person:Richard has "Address Book":_a, Richard has "Last
+Name":Cole.</tt></blockquote>
+
+<p><br>This example shows the syntax in more detail. There is an anonymous
+vertex called
+<br>_a. These verticies are unique within a sentance (sentances are seperated
+by full stops). A comma is used to start a new relationship. If there was
+no comma between _a, and Richard then the vertex Richard would be taken
+to be a relation name, but the comma denotes that the vertex Richard starts
+a new graph.
+<h2>
+Query Graphs</h2>
+A query graph has the same structure as a data graph, only the semantics
+vary.&nbsp; The anonymous nodes in a query graph are mapped via a morphism
+into the triadic structure. The mapping is called a morphism because for
+any edge in the query graph there must be a corresponding edge between
+the verticies mapped to under the morphism in the data graph. Each such
+morphism gives rise to a single query result.
+<p>Here is an example query:
+<blockquote><tt>_a:Richard _b "Software Project":_c.</tt></blockquote>
+This query says retrieve all verticies _a, _b and _c such that Richard
+is-a _a,
+<br>_b relates Richard to _c, and _c is-a Software Project. The answer
+to such a query is a set of morphisms. Using the data graph in Figure 1
+we get a single morphism in the set.
+<blockquote><tt>&nbsp; _a -> Person, _b -> contributes-to, _c -> Griff.</tt></blockquote>
+Such a morphism can be written in a tabular form. For example:
+<br>&nbsp;
+<blockquote><tt>_a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; _b&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+_c</tt>
+<br><tt>----------------------------------</tt>
+<br><tt>Person&nbsp;&nbsp;&nbsp;&nbsp; contributes-to&nbsp;&nbsp; Griff</tt></blockquote>
+The query results can also be used to form a power context family as defined
+by Rudolf Wille at ICCS 97. The objects consist of pairs of verticies,
+the attributes
+<br>consist of relation names and the images of the is-a relation.&nbsp;
+i.e. G = VxV,
+<br>M = {0,1}xV union V and ((u,v),w) in I iff (u,w,v) in E, and ((u,v),(0,w))
+in I iff
+<br>(u,is-a,w) and ((u,v),(1,w)) in I iff (v,is-a,w).&nbsp; The resulting
+concept lattice can then be used to view the data.
+<h1>
+Backward Chaining</h1>
+Backward chaining can be achieved using by simply extending the query graph.
+The problem with chaining from a set of rules in general is that the solution
+tends to be NP hard. A single query graph is efficient to answer but consider
+the following rule and a basic query intended to employ it.
+<p>Rule 1: _c:_b:_a implies _c:_a.
+<br>Query:&nbsp; _a:_b.
+<p>The rule says that is _a is-a _b and _b is-a _c then _a is-a _c. In
+order to solve the query we can keep applying the rule and looking for
+a longer and longer chain between _a and _b. At some point no further query
+will be satisfiable since there won't be enough relationships to determine
+it. There is also the problem that in generating a chain isomarphic graphs
+can be producted via different applications of the single rule.
+<p>The use of backward chaining in this form then is discouraged because
+of the complexity, rather the query graph should be extended manually and
+a subset of the nodes selected for grouping the results.
+<p>Query: _c:_b:_a.&nbsp; select _c, _a.
+<p>Thus the morphisms returned by the query organised into equivalence
+classes formed by considering just the selected nodes.
+<h2>
+Implementation Plan</h2>
+<b>Basic Framework.</b>
+<p>1. Construct parser for the linear form. (Finished).
+<br>2. Construct a memory mapped database for the triadic relationship.
+(Finished).
+<br>3. Construct a query engine to retrieve data from the database. (Not
+started yet).
+<br>4. Translate query results into formal contexts (Not started yet).
+<p><b>Applications.</b>
+<p>1. Tool for a mixed initiative knowledge markup tool for surfing. The
+basic idea is that some relationships are determined automatically by the
+computer while others are input directly by the computer.
+<p>2. Personal information system. A gui frount end consiting of frames
+is used to enter PIS information and the frount end also allows the retrieval
+of information using
+<br>pre-defined queries attached again to frames.
+<br>&nbsp;
+<br>&nbsp;
+<br>&nbsp;
+</body>
+</html>

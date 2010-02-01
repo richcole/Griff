@@ -1,0 +1,18 @@
++++ About Griff
+
+You might be wondering about the name. Well
+
+  - *Griff* is to *Begriffe* what *for* is to *before* and *gin* is
+    to *begin*.
+
+Griff is a collection of software packages that support the
+application of formal concept analysis to various sources of
+information. These packages are in various stages of
+development. Sarl3 and CASS are recommended.
+
+Griff is currently hosted on [Sourceforge][http://sf.net/projects/griff/].
+
+Many related papers can be found on the [KVO website][http://kvocentral.org].
+
+
+

@@ -1,0 +1,9 @@
+*.dep
+moc*.cpp
+*.o
+*.exe
+*.so
+*.a
+*.mak
+
+

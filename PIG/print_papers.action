@@ -1,0 +1,20 @@
+for "_x is-a paper" do
+  println "<paper>"
+  for "_x title _title" do
+    println "  <title>{_title}</title>"
+  done
+  for "_x authors _authors" do
+    println "  <authors>{_authors}</authors>"
+  done
+  for "_x comment _comment" do
+    println "  <comment>"
+    for "_comment author _author" do
+      println "<author>{_author}</author>"
+    done
+    for "_comment text _para" do
+      println "<para>{_para}</para>"
+    done
+    println "  </comment>"
+  done
+  println "</paper>"
+done

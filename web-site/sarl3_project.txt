@@ -1,0 +1,74 @@
++++ Sarl3 - Sets and Relations Library
+
+Sarl is a library designed to support formal concept analysis. Sarl3
+is the third incarnation of the Sarl library. Sarl1 was first written
+in C, Sarl2 was written in Ocaml, and Sarl3 has been written in C with
+a Ruby interface.
+
+++++ Download
+
+Currently the only version of Sarl3 is the content of the CVS
+repository. Checkout the module "sarl3", then change to the sarl3
+directory, edit config.mak for your installation and run make.
+
+Requirements include: gnome2-dev, gtk2-dev, gnome2-ruby, tcltk, ruby, g++
+
+As the project becomes more mature it is intended to construct a
+debian package for Sarl3.
+
+++++ Examples
+
+Following is an example to give a flavour of the library.
+
+---
+  require 'sarl'
+
+  def create_bn_lattice(n)
+    context = Context.new
+    for g in 1..n do
+      for m in 1..n do
+        if g != m then 
+          context.insert(g,m)
+        end
+      end
+    end
+    return Lattice.new(context)
+  end
+---
+
+The first thing to notice about this example is that objects and
+attributes are numbers. This is a central feature of the Sarl
+library. It operates over integers. Of course the integers have
+meanings which can be stored in a string table. However these meanings
+are only important for presentation, not calculation of the lattices
+so they do not play a large part in the library.
+
+---
+   require 'sarl'
+
+   st = StringTable.new()
+   st[1] = "one"
+   st[2] = "two"
+---
+
+Let us now consider calculating the join irreducibles of a lattice.
+
+---
+  require 'sarl'
+
+  # include the create_bn_lattice function given above
+
+  lattice = create_bn_lattice(5)
+  join_irr = BitSet.new()
+  for c in lattice do
+    if lattice.lower_covers[c].count == 1 then
+      join_irr.set(c)
+    end
+  end
+---
+
+This shows that most relations look like arrays. In fact they are
+implemented internally as arrays and manifest themselves as such at
+the ruby layer.
+
+

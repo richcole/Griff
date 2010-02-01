@@ -1,0 +1,12 @@
++++ Sarl3 Scrolling Labels
+
+From the todo list:
+
+  - relatively straight foward. Labels are characterised by a height,
+    in number of lines, an first line (number of lines again) and a
+    width in pixels. Cropping is used to limit the width. Labels start
+    of with a height of 4 (or less if they have fewer lines) and an
+    uncropped width. Under the scrollbar is a drag button than can be
+    used to make the label bigger. Is there something in gdk for this?
+    Can scrollbar be drawn using gdk?
+

@@ -1,0 +1,128 @@
+
+\slide{Motivating example}
+
+\includegraphics{../graph.ps}
+
+
+\begin{enumerate}
+\begin{verbatim}
+pluto:/# apt-get install cdebconf
+Reading package lists... Done
+Building dependency tree... Done
+Some packages could not be installed. This may mean that you have
+requested an impossible situation or if you are using the unstable
+distribution that some required packages have not yet been created
+or been moved out of Incoming.
+
+Since you only requested a single operation it is extremely likely that
+the package is simply not installable and a bug report against
+that package should be filed.
+The following information may help to resolve the situation:
+
+The following packages have unmet dependencies:
+  cdebconf: Depends: libgtk2.0-0 (>= 2.6.0) but it is not going to be installed
+            Depends: libpango1.0-0 (>= 1.8.2) but it is not going to be installed
+E: Broken packages
+\end{verbatim}
+\end{enumerate}
+
+
+\slide{Interesting objectives}
+
+\begin{enumerate}
+\item helping maintainers, developers, users to resolve conflicts in packaging system
+\item automatically find uninstallable packages
+\item \emph{explain}, why a package is uninstallable - both graphically and in words
+\item give some minimal set of ``guilty'' packages
+\item guidance in resolving conflict (``what happens, if I remove that dependency?'')
+\end{enumerate}
+
+
+
+\slide{Debian packaging system}
+
+\begin{enumerate}
+\item divided into three distributions: \emph{stable}, \emph{testing}, \emph{unstable}
+\item \emph{stable}: no new packages, just security updates (or packages with grave bugs)
+\item \emph{testing} becomes \emph{stable} after a freeze (last time: June 6th, 3.1 \emph{Sarge}, 2002, 3.0\emph{Woody})
+\item few restrictions for a package to get into \emph{unstable}
+\item transition \emph{unstable} -> \emph{testing}: 
+\begin{itemize}
+\item in sync on all distributions
+\item no dependencies, that makes package uninstallable
+\item fewer release-critical bugs than the version currently in \emph{testing}
+\item available in \emph{unstable} for at 2, 5, 10 days (depending in urgency)
+\item must not break dependency of any package in \emph{testing}
+\item depending packages already in \emph{testing} or accepted at the same time
+\end{itemize}
+\item broken, i.e. \emph{uninstallable} packages only in \emph{unstable}
+\item bug reporting system: everbody can participate, has influence on package transition (``\emph{release critical bugs}'')
+\item 16700 packages in unstable, several hundred maintainers
+\item most interesting thing: it works!
+\item social aspect: community of several thousend people enhancing Debian all the time, working together
+trough mailing lists, bug tracking system, CVS and packaging system
+\end{enumerate}
+
+\slide{Package metadata}
+
+\begin{minipage}
+\begin{verbatim}
+Package: cdebconf
+Priority: extra
+Section: utils
+Installed-Size: 316
+Maintainer: Debian Install System Team <debian-boot@lists.debian.org>
+Architecture: i386
+Version: 0.84
+Provides: debconf-2.0
+Depends: libatk1.0-0 (>= 1.9.0), libc6 (>= 2.3.5-1), libdebian-installer4 (>= 0.31), libglib2.0-0 (>= 2.6.0), libgtk2.0-0 (>= 2.6.0), libnewt0.51, libpango1.0-0 (>= 1.8.2), libtextwrap1
+Conflicts: debconf, debconf-doc
+Filename: pool/main/c/cdebconf/cdebconf_0.84_i386.deb
+Size: 129306
+MD5sum: 40ad3744b2c7795c8fc8de647e657c64
+Description: Debian Configuration Management System (C-implementation)
+ Debconf is a configuration management system for Debian packages. It is
+ used by some packages to prompt you for information before they are
+ installed. This is a reimplementation of the original debconf version
+ in C.
+ .
+ Installing this package is rather dangerous now. It will break debconf.
+ You have been warned!
+Tag: devel::packaging, suite::debian, uitoolkit::gtk
+\end{verbatim}
+\end{minipage}
+
+
+\begin{enumerate}
+\item Description, Maintainer, Tag
+\item Package, Section, Installed-Size, Size, MD5Sum
+\item Priority, Architecture, Version, Provides, Depends, Conflicts, Filename
+\item packages which \emph{have to be} installed and which \emph{can't} be installed together with particular package
+\item \emph{conflicts} arise, when a package (transitively) depends on some non-existing package or when it depends on some package which is ``somehow'' in conflict
+\item recently: \emph{tagging} of packages (we wrote some small FCA application)
+\end{enumerate}
+
+
+\end{enumerate}
+
+
+\slide{Min-UNSAT}
+
+\begin{enumerate}
+\item \emph{minimally-unsatisfiable subformulas} (MUS) of an unsatisfiable CNF formula $\varphi$
+\item in general NP-hard
+\item two implementations, both calculating \emph{maximally satisfiable subformulas} (MSS) first
+\item example: 
+\begin{enumerate}
+  \item $\varphi = (x_1) \land (\overline{x_1\) \land (\overline{x_1} \lor x_2) \land (\overline{x_2})$
+  \item $\operatorname{coMSS}(\varphi) = \bigl{
+      \{(x_1)\}, 
+      \{(\overline{x_1}),(\overline{x_1} \lor x_2)\},
+      \{(\overline{x_1}),(\overline{x_2}\)\}\bigr}$
+  \item $\operatorname{MUS}(\varphi) = \bigl{
+      \{(x_1),(\overline{x_1})\},
+      \{(x_1),(\overline{x_1} \lor x_2), (\overline{x_2})\}\bigr}$
+\end{enumerate}
+\end{enumerate}
+
+

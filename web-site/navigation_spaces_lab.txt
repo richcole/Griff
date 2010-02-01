@@ -1,0 +1,45 @@
++++ Navigation Spaces Lab Notes
+
+++++ BCEL Screenshot
+
+The BCEL library was investigated using CASS. Below is a screenshot of
+the call-graph between high level packages in Java.
+
+<<shot3.png>>
+
+This diagram shows the packages in the Java library together with some
+other top level packages. Only classes reached from the BCEL library
+by following inheritance links and method calls were
+considered. However once can see that the coverage is considerable. It
+will thus be interesting to see if this diagram changes significantly
+when generated from the Java runtime environment.
+
+Perhaps a few more words about how the lattice was generated. It is
+showing method calls completed with respect to the package hierarchy a
+la navigation spaces. It is not the non-transitive version of the
+calls relation which is being used.
+
+The diagram is quite curious because it is very irregular. Perhaps we
+have come to expect that from the Java libraries. The top concept
+shows that everything uses java.util and java.lang. Looking down we
+see that java.lang as an object is collocated with java.security while
+java.util occurs much higher collocating with java.text.
+
+
+++++ Kowari Screenshot
+
+Following is a lattice organising the kowari org packages, including
+the contents of org.kowari by which top level packages they access.
+
+<<kowari-1.png>>
+
+This diagram is fairly neat it shows that itql and server both make
+use of jards while. server uses com, while itql uses javax. We see
+that resolver and content use javax and com. We can see that store is
+using something in gnu.
+
+<<shot-9.png>>
+
+
+
+

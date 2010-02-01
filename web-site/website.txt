@@ -1,0 +1,12 @@
++++ Web Site
+
+The website has been crafted with two things. A ruby script that turns
+txt files into html files and a css style sheet shamelessly copied from
+a influenced by a variety of nice sites the web. [Bookmarks][bookmarks.html]
+contains some links to some of these.
+
+This website is stored in the CVS repository of the Griff project.
+
+
+
+

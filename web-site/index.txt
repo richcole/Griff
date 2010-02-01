@@ -1,0 +1,13 @@
++++ Welcome to Griff
+
+Griff is an assortment of software related to the application of
+[Formal Concept Analysis][fca_topic.html]. The project also is a kind
+of blog, in that it contains various topics and manifestos written by
+[Richard Cole][about_rcole.html] on a variety of software related topics.
+
+Please refer to the menu on the left for places to navigate.
+
+Oh, the SourceForge project website is
+[http://sf.net/projects/griff][http://sf.net/projects/griff].
+
+

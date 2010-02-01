@@ -1,0 +1,467 @@
++++ An example of using Rails to explore Data
+
+I have some data describing some experiments and I would like to
+produce some reports of the data describing various aspects. Lets see
+how easy it is to do this using Rails. I'm not familar with Rails so
+I'll be putting in links to tutorials and documentation that I've
+found along the way.
+
+++++ Creating the Database
+
+I have a single database table that is already in SQL format (it was
+exported from MySQL). So the first step is to insert this data into a
+postgres database.
+
+---
+> sudo -s
+> su - postgres
+> createuser rcole
+Shall the new user be allowed to create databases? (y/n) y
+Shall the new user be allowed to create more new users? (y/n) y
+> exit
+> exit
+> createdb jobs
+CREATE DATABASE
+---
+
+The next step is to create the database. Since I have an SQL dump sent
+to me by Robert persumably I can just insert it. (Note that MySQL and
+Postgres have different syntax for auto-incrementing unique id's on
+table entries).
+
+---
+> psql jobs rcole -f debian.sql 
+psql:debian.sql:19: ERROR:  syntax error at or near "EXISTS" at character 15
+...
+---
+
+Hmm, that didn't work, there were lots more errors, but lets look at
+the first one.
+
+---
+DROP TABLE IF EXISTS `jobs`;
+---
+
+Hmm, it would appear that this MySQL instruction isn't supported by
+Postgres. Let's see what Google has to say. Google says you can't
+conditionally drop tables in Postgres, you have to muck around with
+stopping errors and such. Not too nice.
+
+Well we don't have the table so I'll just comment out the line.
+
+---
+> psql jobs rcole -f debian.sql 
+psql:debian.sql:31: ERROR:  syntax error at or near "`" at character
+14
+...
+---
+
+This is generated from the following statement.
+
+---
+CREATE TABLE `jobs` (
+  `id` int(10) unsigned NOT NULL auto_increment,
+  `job_type` varchar(10) NOT NULL default '',
+  `job` varchar(255) NOT NULL default '',
+  `insert_date` timestamp NOT NULL default '0000-00-00 00:00:00',
+  `start_date` timestamp default NULL,
+  `finish_date` timestamp default NULL,
+  `state` varchar(10) default NULL,
+  `machine` varchar(20) default NULL,
+  `batch_date` date NOT NULL default '0000-00-00',
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+---
+
+Well the engine stuff can go. And the 'auto_increment' attribute needs
+to become 'serial', but not in Postgres 7.3 where it must become
+'default nextval('jobs_serial')'. We move the primary key statement
+into the definition for job types. It also seems that those backticks
+are no good. Time fields are also different in Postgres: 'timestamp'
+becomes 'timestamp without timezone'. The zero time also got change to
+allballs. It is also apparent after a while that 0000-00-00 is not a
+valid date and so postgres rejects it saying out of range. Instead one
+must convert 0000-00-00 to 000-01-01 or perhaps null, probably better
+is to use now.
+
+---
+DROP TABLE jobs;
+SET datestyle TO iso;
+CREATE TABLE jobs (
+  id integer default nextval('jobs_serial') not null primary key,
+  job_type varchar(10) NOT NULL default '',
+  job varchar(255) NOT NULL default '',
+  insert_date timestamp without time zone NOT NULL default now(),
+  start_date timestamp without time zone default NULL,
+  finish_date timestamp without time zone default NULL,
+  state varchar(10) default NULL,
+  machine varchar(20) default NULL,
+  batch_date date NOT NULL default now()
+) ;
+---
+
+The next error involved locking the table jobs. In postgres presumably
+we don't need to lock the table. I'm not sure what operations are
+considered atomic, but I guess until a commit is performed the
+operation is atomic, but is it single access? Probably not.
+
+The next error involved a comma between the values being inserted into
+the table. It seems that postgres only allows one item to be inserted
+at a time into the table unless the data is being read from an
+external file. So I used emacs and a macro to split the insert
+statement up into multiple statements.
+
+++++ Creating a Rails Application
+
+Here I'm following the process describing in the
+[http://www.onlamp.com/pub/a/onlamp/2005/01/20/rails.html?page=2][OnLamp
+tutorial] which goes through a very basic Rails Application.
+
+Rails is basically a framework that seperates out different aspects of
+a web-application. Data is stored in a backend database. Views of the
+data are constructed and method for modifying the data are also
+constructed. The view part has two orthogonal dimensions: the visual
+style of the application; the presentation of tables; the collection
+of information on pages.
+
+Well we should expect these orthogonal facets to unfold as we use
+Rails to construct an application. The first step is to create an
+empty application.
+
+---
+rails jobs
+---
+
+Now we test that it worked. We run the server and then visit And then
+visit: http://127.0.0.1:3000/ with our browser.
+
+---
+cd jobs
+ruby script/server
+---
+
+So now we create a controller. A controller will essentially give us a
+space in which we can construct pages. The following also sets up a
+my_test directory in views indicating that views are organised by
+controllers, i.e. the controller is functionally dependent on the
+view.
+
+---
+ruby script/generate controller MyTest
+emacs app/controllers/my_test_controller.rb &
+---
+
+So we can add the following method to the controller that shows that
+each method of the controller responds to suitable URLS.
+
+---
+class MyTestController < ApplicationController
+   def index
+     render_text "Hello World"
+   end
+end
+---
+
+Now to make a connection to the database we need to contruct a model
+with Rails
+
+---
+ruby script/generate model debian
+---
+
+Our database was called jobs. But I got confused here and called it
+debian on the rails side. It doesn't matter that the name doesn't
+match because the name gets specified in a configuration file a little
+bit later. Anyway now we have to generate a controller that we will
+connect to the debian model.
+
+---
+ruby script/generate controller debian
+emacs app/controllers/debian_controller.rb &
+---
+
+Now we add scaffolding to the debian controller. This will essentially
+add methods for new, old, etc. I expect that this is essentially like
+using a mixin, it imports methods and perhaps also sets up a variable.
+
+---
+class DebianController < ApplicationController
+  scaffold :jobs
+end
+---
+
+Now testing the new debian controller http://127.0.0.1:3000/debian/ we
+get an error.
+
+---
+  Errno::ENOENT in Debian#index
+  No such file or directory - /var/run/mysqld/mysqld.sock
+  script/server:51
+---
+
+Ok, so we need to modify the model to make it refer to a postgres
+database. The relevent file seems to be: config/database.yml 
+
+---
+development:
+  adapter: mysql
+  database: rails_development
+  host: localhost
+  username: root
+  password: 
+
+# Warning: The database defined as 'test' will be erased and
+# re-generated from your development database when you run 'rake'.
+# Do not set this db to the same as development or production.
+test:
+  adapter: mysql
+  database: rails_test
+  host: localhost
+  username: root
+  password:
+
+production:
+  adapter: mysql
+  database: rails_production
+  host: localhost
+  username: root
+  password: 
+---
+
+We need to change this so that it refers to postgres.
+
+---
+development:
+  adapter: postgresql
+  database: jobs
+  host: localhost
+  username: rcole
+  password: 
+
+# Warning: The database defined as 'test' will be erased and
+# re-generated from your development database when you run 'rake'.
+# Do not set this db to the same as development or production.
+test:
+  adapter: postgresql
+  database: jobs_test
+  host: localhost
+  username: rcole
+  password:
+
+production:
+  adapter: postgresql
+  database: jobs_production
+  host: localhost
+  username: rcole
+  password: 
+---
+
+A change to the database means that the server must be restarted. Not
+that the other modifications to the ruby scripts are picked up
+automatically.
+
+---
+ruby script/server 
+---
+
+Now trying to load the page reports an access problem.
+
+---
+PGError in Debian#index
+FATAL:  IDENT authentication failed for user "rcole"
+script/server:51
+---
+
+Hmm, there's a problem here. I don't want to put my password into the
+rails application. So I need to create a new user, give them a
+password and give them LOCAL access to the database.
+
+---
+> psql jobs rcole
+jobs=# create user rails
+CREATE USER
+jobs=# grant all on jobs to rails ;
+GRANT
+alter user rails password 'xxxxxxxx';
+ALTER USER
+---
+
+Obviously I didn't really set the password to 'xxxx', but rather
+something else ;) Now I have to go back and put rails as the user of
+the database. Now don't forget when the database info is updated the
+server has to be reset.
+
+Now the postgres database has to be updated to accept password
+authentication for the rails user from localhost. The relevent file to
+edit is: file:///etc/postgresql/7.4/main/pg_hba.conf
+
+---
+local   all         postgres                                ident sameuser
+#
+# All other connections by UNIX sockets
+local   all         rails                                   md5
+local   all         all                                     ident sameuser
+#
+# All IPv4 connections from localhost
+host    all         rails    127.0.0.1    255.255.255.255   md5
+host    all         all      127.0.0.1    255.255.255.255   ident sameuser
+---
+
+Now the scafolding doesn't work. Presumably the scaffold must conform
+the name to the table and also the name of the model. Rather than
+bothering with the scaffolding lets instead start trying to construct
+some usefull methods.
+
+Jumping forward in the model we see that it continues to use the
+scaffolding to fetch the relevent view. So it looks like we need go
+back and construct a new model.
+
+---
+script/destroy model debian
+script/generate model job
+script/destroy controller debian
+script/generate controller job
+emacs app/controllers/job_controller.rb &
+---
+
+We reinsert the scaffolding by editing: app/controllers/debian_controller.rb
+
+---
+class JobController < ApplicationController
+  scaffold :job
+end
+---
+
+Ok, so now the scaffolding works, in so far as the table is being
+displayed quite competently to the user. The table could be made much
+more readable by using a style. What are the options?
+
+Well the tutorial suggests that we construct our own view. Since rails
+automatically did such a good job from the schema data this seems a
+bit of pity, however lets run with it and see where it gets us.
+
+First we add a method to the controller to
+app/controllers/job_controller.rb.
+
+---
+class JobController < ApplicationController
+  scaffold :job
+
+  def list
+    @jobs = Job.find_all
+  end
+end
+---
+
+Incidently it would seem that this is going to fetch the entire table
+into memory. It isn't clear how lazy the application framework is. We
+now need to construct a view: app/views/job/list.rhtml
+
+---
+<html>
+<head>
+<title>List of All Jobs</title>
+</head>
+<body>
+
+<h1>Jobs Used to Compute MinUnsat and Other Things</h1>
+<table border="1">
+ <tr>
+  <td width="20%"><p align="center"><i><b>Id</b></i></td>
+  <td width="20%"><p align="center"><i><b>Type</b></i></td>
+ </tr>
+
+ <% @jobs.each do |job| %>
+  <tr>
+   <td><%= link_to job.id, :action => "show", :id => job.id %></td>
+   <td><%= job.type %></td>
+  </tr>
+ <% end %>
+</table>
+<p><%= link_to "Create new job", :action => "new" %></p>
+
+</body>
+</html>
+---
+
+Ok, so that made something pretty limited and ugly. It displayed all
+of the jobs. The tutorial adds a bit of functionality that was already
+provided by the frameworkd that isn't very relevent to what I want to
+do so I'm skipping it.
+
+The next thing of interest is the use of layouts. Hopefully these will
+allow us to specify headers and footers across the application and to
+insert reference to a style sheet.
+
+First thing is to edit the job controller again to add a layout:
+app/controllers/job_controller.rb.
+
+---
+class JobController < ApplicationController
+  layout "standard-layout"
+  scaffold :job
+
+  def list
+    @jobs = Job.find_all
+  end
+end
+---
+
+The use of a string instead of a symbol is curious here. What is that
+all about? Maybe it will become clear. So we now need to add some
+custom layout: app/views/layouts/standard-layout.rhtml
+
+---
+<html>
+ <head>
+   <title>Debian Jobs</title>
+ </head>
+ <body>
+   <h1>Debian Jobs</h1>
+   <%= @content_for_layout %>
+   <p>
+     <%= link_to "Create new job", 
+                 :controller => "job", 
+                 :action => "new" %>
+     
+   <%= link_to "Show all jobs", 
+               :controller => "job", 
+               :action => "list" %>
+     
+   </p>
+ </body>
+</html>
+---
+
+Ok so now the layout is fighting the content. The both have header and
+footer information. The API for active records can be found here:
+http://api.rubyonrails.org/classes/ActiveRecord/Base.html#M000684 It
+is possible to use the method find(:all, :offset = 0, :limit => 10).
+So we modify app/controllers/job_controller.rb.
+
+---
+class JobController < ApplicationController
+  layout "standard-layout"
+  scaffold :job
+
+  def list
+    @jobs = Job.find(:all, :offset => 0, :limit => 10)
+  end
+end
+---
+
+So now we want to display a histogram using rails. There is a good SVG
+library for constructing histograms. For the later purpose of
+including these files in a latex document vector graphics is good, but
+SVG may be a poor choise because of the lack of conversion to PDF.
+
+After looking around it seems that it is quite difficult to convert
+SVG to PDF. In fact it is quite difficult to construct embedded
+PDF. The easiest thing to do is to use the svg_graph library to
+produce png for inclusion in latex documents since few tools are
+capable of transforming SVG into either eps or pdf without
+rasterising. There was a program in Cairo, but of course Cairo is
+broken, and the program isn't supported and doesn't compile any more.
+
+
+

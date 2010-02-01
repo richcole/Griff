@@ -1,0 +1,78 @@
+# + Random Thoughts
+#
+# ++ Comments
+#
+# One can specify classes with '@class Array' for instance. 
+#
+# ++ Modules
+#
+# There is a class path if you will and classes can be imported using require.
+# So for example:
+# ---
+# require Array
+# ---
+# will essentially include the contents of the file 'Array.rj' in the program.
+# Some of the standard files are included automatically. Classes are
+# included just by mentioning them in the code, so for example:
+# ---
+# x = Array.new
+# ---
+# makes reference to the class Array which will be loaded. The dot notation
+# also corresponds to Modules as well as arrays so:
+# ---
+# Std.Array.new
+# ---
+# makes reference to the class Array in the Module Std. This class is expected
+# to be found in the file '/Std/Array.rj'. The keywork 'using' indicates that
+# a class should first be sort in the package specified by using, so:
+# ---
+# using Std
+# using Override
+#
+# x = Array.new
+# ---
+# will look for Array in Override, then Std, then the standard namespace.
+# The scope of a using statement is the file in which it is declared. One
+# may also name a namespace so:
+# ---
+# rename com.sun as sun
+# rename javax
+# using javax
+# using javax.util
+#
+# x = Array.new
+# ---
+# for example allows a module to be renamed. If they are to be used 
+# seperate statements 'using' them are required.
+#
+# As for many commands multiple arguments are allowed the using statement.
+# e.g.
+# ---
+# using javax, javax.util
+# ---
+#
+# This is equivalent to multiple consecutive using statements. The module
+# structure is determined wholely by the file system directory structure.
+# A file has access to the files in the same directory, so for example
+# if Array and Hash are defined in the same directory then they can access
+# each other without requiring a using statement.
+#
+# There is also a default path which specifies modules that are used by 
+# default.
+#
+# Since the source code also contains Wikiwords a seperation between 
+# files for WikiWords and classes is achieved by having filenames of
+# WikiWord being 'wiki_word.rj' and a class ArrayList being 'ArrayList.rj'.
+#
+# The norm is for Modules to being with a capital letter. e.g. in Std.Array
+# the module Std has a capitial and corresponds to the directory 'Std' 
+# (and the file ('Array.rj') in that directory.
+#
+# + Compiled Language
+#
+# At present is seems that first implementation of RJL is likely to be a
+# translation to C. I'm not quite sure how an implementation of blocks
+# is going to go with respect to a C implementation.
+#
+# At any rate RJL will need to be able to load dynamic libraries that
+# contain class implementations as is done in Ruby. 

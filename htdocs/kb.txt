@@ -1,0 +1,90 @@
+
+FACTS
+
+person:"Richard Cole" has phone-number:"+61 (0) 7 325-77-025".
+"+61 (07) 325-77-025" has local-number:"325-77-025".
+person:"Richard Cole" occupies room:_x has room-number:1.25.
+person:"Richard Cole" has phone-book:_a contains entry:_b
+  name person:"Bernd Groh", 
+  _b phone-number:work-phone-number "+61 (0) 7 5552-8923",
+  _a contains entry:_c name person:"Peter Eklund",
+  _c work-phone-number "+61 (0) 7 5552-8184",
+  _a contains entry:_c name "Peter Eklund",
+  _c phone-number:home-phone-number "+61 (0) 7 5526-3839".
+"Richard Cole" has:has-via-work Computer:_a has processor:"Pentium i386",
+_a name "Tempus".
+
+/* A potential problem of such a scheme is a unique names assumption,
+ * objects which are named are assumed to have a unique name. Most
+ * names however appear as just that names. i.e. the names are not
+ * linked to much. Relation names however are much more tangled with
+ * the knowledge.
+ */
+
+QUERY person:_a has phone-number:_b. AS _a _b.
+
+  FOR _a in dom(is-a,person) LOOP
+      FOR _b in rng(has, _a) LOOP
+          IF dom(is-a,_b) THEN
+             ...
+
+  Person          Phone-Number
+  --------------------------------------
+  Richard         +61 (0) 7 325-77-025
+
+QUERY phone-book:_a contains _b name _c, _b phone-number _d. AS _b _d.
+
+  FOR _a in dom(is-a,phone-book) LOOP
+      FOR _b in rng(contains,_a) LOOP
+         FOR _c in rng(name,_b) LOOP
+             FOR _d in rng(phone-number,_b) LOOP
+                 ...
+
+  name            number
+  --------------------------------------
+
+QUERY phone-book:_a contains _b name _c, _b phone-number:_d _e. 
+AS _b _e _d.
+
+  FOR _a in dom(is-a,phone-book) LOOP
+      FOR _b in rng(contains,_a) LOOP
+         FOR _c in rng(name,_b) LOOP
+             FOR _d in dom(is-a,phone-number) LOOP
+                 FOR _e in rng(_b,_d) LOOP
+                     ...
+
+
+  name            number                is-a
+  ---------------------------------------------
+  Bernd Groh      +61 (0) 7 5552 8923   work-phone-number
+  Peter Eklund    +61 (0) 7 5552 8184   work-phone-number
+                  +61 (0) 7 5552 8184   home-phone-number
+
+/* Thus queries are given as graphs in which only selected nodes are
+ * displayed to the user. The result set is always given as the
+ * cartesian product and can be scaled using a power context family.
+ */
+
+/* The construction of queries relies on a recursive algorithm that
+ * steps throught the graph to retrieve usefull information. The 
+ * construction of the query requires a knowledge and use of a
+ * scheme. This can be enforced to some extent through the use of
+ * forms for the input of data.
+ */
+
+product:ph_product:_x brand-name "Panadol", _x generic-name
+"Paracetamol", _x form tablet, _x form capsule, _x form caplet,
+_x tablet-dose _y form tablet, _y dose 500mg, _y dose 200mg.
+
+/* 
+ * Whenever two attributes appear together in a particular form this
+ *  requires the rarification of a node so for example:
+ *
+ *    (500mg tablet, 200mg tablet, 200mg caplet, 300mg capsule)
+ *
+ * This will generate an anonymous node for each combination. This does
+ * allow a form of generalisation over the data however because the
+ * context is given by connectivity and so can be ignored to some
+ * extent.
+ */
+

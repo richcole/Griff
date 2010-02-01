@@ -1,0 +1,7 @@
+RJ_CGI_RELEASE_0_1
+  This is an initial release of the RJ_CGI library. The library
+  contains a single Ocaml module that was previous released
+  under the GPL. This module added something slight and packaged it
+  so it could be installed via GODI
+
+

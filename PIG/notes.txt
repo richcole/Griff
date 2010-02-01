@@ -1,0 +1,39 @@
+---+ Some brief notes now lost in time. 
+
+test_tree is passing its tests. A test to ensure that the tree
+invarient is preserved is required. More code to ensure that when an
+overflow occurs the first attempt is to insert it into an existing
+non-full node.
+
+Should also check that interior nodes are full.
+
+There is currently a bug somewhere in the query code. The test program
+should be a sufficient data set but the query which expose the data
+still need to be constructed.
+
+---+ Bug report
+
+After using the navigation space a little a bug appeared where the navigation
+space calculation just stopped. I am fairly clear that this was not
+caused by a concurrent modification problem.
+
+The persistence of these bugs suggests starting to implement the store
+again in a somewhat more modular way. In a way that uses more memory,
+but at the same time provides transaction support.
+
+The basic idea for transaction support is to load nodes into main
+memory and to only sync them back to disk at the end of a
+transaction. This can be done using a log perhaps in the following
+way:
+
+  - there is a block permutation which keeps track of a mapping to
+    disk blocks
+  - when a block is modified it is allocated to a new position on the
+    disk and when the write is complete the permutation is then
+    updated
+  - The permutation is built up as a sequence and written to disk. The
+    last thing to be written to the disk is a checksum or some sort of
+    checking device.
+
+This can be worked out more on paper in the pub perhaps.
+

@@ -1,0 +1,134 @@
++++ RJL Typing
+
+I suspect that the typeing in RJL can be done using propositional
+logic with appropriate rules. Lets consider the following code
+fragment as an example.
+
+---
+1.  interface 'a Enumerable
+2.    def each(block: 'a -> Object)
+3.  end
+4.
+1.  interface 'a Indexable
+2.    def push(value: 'a)
+3.  end
+4.
+5.  module 'a Enumerator
+5.    :requires 'a Enumerable
+5.
+6.    def fold(z: 'b, fun: 'b * 'a -> 'b)
+7.      each { x | z = fun(z, x) }
+8.      z
+8.    end
+9.  end
+10.
+10. class 'a Array 
+10.   :implements 'a Enumerable
+10.   :includes 'a Enumerator
+10. end
+11.
+12. a = []    // type of a is Object Array
+13. a.push(1) // type remains Object Array since push(o: Object) matches
+14.
+15. a.fold(0) { z, x | z + x } 
+---
+
+The numbers are just to mark lines. We must assume that Enumerator is
+included by Array.
+
+12. type(a) = 'a Array, 'a <= Object ([] translates to Object Array.new)
+13. 'a >= Integer
+15. 'b >= Object, 'b >= Integer
+
+This means that we would admit the following code:
+
+---
+15.  a.fold("0") { z, x | z + x }
+---
+
+Because the statement hasn't been typed we couldn't infer any type
+restrictions. Type checking doesn't happen when the type of a variable
+is Object.
+
+On the other hand, consider that for method local types we assert
+equality, then:
+
+---
+15. a.fold(0) { z, x | z + x } 
+---
+
+produces
+
+12. type(a) = 'a Array, 'a <= Object
+13. 'a >= Integer
+15. 'b = Integer which checks out with sig(Integer.+) = Int * Int -> Int
+
+In such a system every variable has a type associated with it. Let us
+consider what happens in a simple method call using a constrained
+type.
+
+def meth(a, b)
+  a.meth(b)
+end
+
+Now consider that we know "type(a) <= A", and that "sig(A.meth) = B ->
+Object", then we can infer that type(b) <= B.
+
+In order to know anything about fold we need to know its signature. In
+the above example (using fold) consider that we have "type(a) = Object
+Array", then we know the signature of fold is "'b * ('b * 'a -> 'b) ->
+'b", so we can conclude that 'b = Integer, within the block we can
+transfer these types to conclude that type(z) = Integer, and type(x) =
+Integer, we can then check the signature of '+'.
+
+Note that in this setting we used signatures and go into code blocks
+(which do not have virtual dispatch) but we don't follow virtual
+method calls.
+
+Since we don't follow virtual method calls we can't check that fold
+doesn't do something silly, or can we:
+
+---
+6.    def fold(z: 'b, fun: 'b * 'a -> 'b)
+7.      each { x | z = fun(z, x) }
+8.      z
+9.    end
+---
+
+Typing this code fragement we extract the signature for each, which
+comes from the block. sig(each) = ('a -> Object) -> Object, so type(x)
+= 'a, z comes from the calling context so type(z) = 'b infered from
+the arguments, so the assignment involving z checks out.
+
+Now what happens with this type of checking when we pass a string.
+
+---
+15.  a.fold("0") { z, x | z + x }
+---
+
+Then 'b = String, type(z) = 'b, sig(String.+) = String * String ->
+String, 'a <= String, but there is no type that extends both String
+and Integer.
+
+For speed reasons we don't want to box integers. It is also
+undesirable to box floating point numbers. This can be overcome to
+some extent by having custom implmentations for Int Array, Float
+Array, and Double Array.
+
+How are methods dispatched? If we know the type of an object, then we
+may be able to infer that the method has not been overridden in any
+subtype and therefore we can avoid having to do a dispatch. Otherwise
+we do a dispatch by looking up the method name.
+
++++ Type System: How it works
+
+Every expression is mapped to a type. The parse tree is iterated until
+a fixed point is reached and no types are further narrowed. Because
+the upper most scope for a type parameter is the class iteration is
+local to each file (hopefully).
+
+
+
+
+
+

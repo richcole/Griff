@@ -1,0 +1,5 @@
+select $a 
+  from <rmi://localhost/server1#toscanaj>
+where
+  <gr:ontorama.views.tree.view.OntoTreeView> <gr:in-rt> $a
+;

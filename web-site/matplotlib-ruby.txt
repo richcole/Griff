@@ -1,0 +1,97 @@
++++ How to Install MatPlotLib for Ruby
+
+MatPlotLib is a python library but it is pretty cool. I want to create
+plots using Rails so I need the bridge to ruby. Here is a rundown of
+what I did to get this work.
+
+++++ Install the Ruby-Python Bridge
+
+Download and install [ruby-python][http://raa.ruby-lang.org/project/ruby-python/]
+
+I changed two macros in typemap.c from INT2FIX to INT2NUM because
+object pointers were being corrupted. I guess there is a slight
+performace hit.
+
+---
+/* store PyObject* as Integer in Hash */
+#define PYOBJ2NUM(po) (INT2NUM((int)po))
+#define NUM2PYOBJ(n) ((PyObject *)NUM2INT(n))
+---
+
+Also to compile with python2.4 I changed extconf.rb:
+
+---
+py_dir        = with_config("python-dir")
+py_ver        = with_config("python-ver")
+---
+
+I added the second variable and did a global replace of python1.4 to #{py_ver}.
+---
+
+++++ Install MatPlotLib
+
+I got debian packages for python-matplotlib from:
+
+---
+deb http://anakonda.altervista.org/debian/packages/ ./
+# deb-src http://anakonda.altervista.org/debian sources/
+---
+
+++++ Write some ruby code to generate a basic histogram
+
+Following is python example 
+
+---
+#!/usr/bin/env python
+from pylab import *
+
+mu, sigma = 100, 15
+x = mu + sigma*randn(10000)
+
+# the histogram of the data
+n, bins, patches = hist(x, 50, normed=1)
+setp(patches, 'facecolor', 'g', 'alpha', 0.75)
+
+# add a 'best fit' line
+y = normpdf( bins, mu, sigma)
+l = plot(bins, y, 'r--')
+setp(l, 'linewidth', 1)
+
+xlabel('Smarts')
+ylabel('Probability')
+title(r'$\rm{Histogram\ of\ IQ:}\ \mu=100,\ \sigma=15$')
+axis([40, 160, 0, 0.03])
+grid(True)
+
+#savefig('histogram_demo',dpi=72)
+show()
+---
+
+Let's convert that into Ruby.
+
+---
+require 'python'
+require 'python/matplotlib'
+require 'python/matplotlib/backends'
+require 'python/matplotlib/cm'
+
+include Py::MatPlotLib
+
+mu, sigma = 100, 15
+x = 1:1000.map{|m| sigma*rand()} + mu
+
+# the histogram of the data
+n, bins, patches = hist(x, 50, normed=1)
+setp(patches, 'facecolor', 'g', 'alpha', 0.75)
+y = normpdf( bins, mu, sigma)
+l = plot(bins, y, 'r--')
+setp(l, 'linewidth', 1)
+
+xlabel('Smarts')
+ylabel('Probability')
+title('\rm{Histogram\ of\ IQ:}\ \mu=100,\ \sigma=15')
+axis([40, 160, 0, 0.03])
+grid(True)
+
+show()
+---

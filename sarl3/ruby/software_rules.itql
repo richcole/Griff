@@ -1,0 +1,63 @@
+  # name all the predicates
+  insert
+    <gr:is-member>     <gr:is-a>     <gr:relation>
+    <gr:in>            <gr:is-a>     <gr:relation>
+    <gr:in-rt>         <gr:is-a>     <gr:relation>
+    <gr:calls>         <gr:is-a>     <gr:relation>
+    <gr:calls-in>      <gr:is-a>     <gr:relation>
+    <gr:n>             <gr:is-a>     <gr:set>
+    <gr:h>             <gr:is-a>     <gr:set>
+    <gr:root-package>  <gr:is-a>     <gr:type>
+  into
+    <rmi://localhost/server1#toscanaj> 
+  ;  
+
+  # Load the contents of the class file analysis
+  load <file:///tmp/import.n3> into <rmi://localhost/server1#toscanaj> ;
+
+  # Calculate the transitive closure of in
+  insert 
+    select $a <gr:in-rt> $b
+    from <rmi://localhost/server1#toscanaj>
+    where 
+      ( ($a <gr:in> $b) or trans($a <gr:in> $b) )
+  into <rmi://localhost/server1#toscanaj>
+  ;
+
+  # Calculate the calls-in relation
+  insert
+    select $ap <gr:calls-in> $bp
+    from <rmi://localhost/server1#toscanaj>
+    where
+      $a <gr:calls> $b and
+      $a <gr:in-rt> $ap and
+      $b <gr:in-rt> $bp
+  into <rmi://localhost/server1#toscanaj>
+  ;
+  insert
+    select $a <gr:calls-in> $b
+    from <rmi://localhost/server1#toscanaj>
+    where
+      $a <gr:calls> $b
+  into <rmi://localhost/server1#toscanaj>
+  ;
+
+#
+# These next two are because in-rt is not reflexive yet
+#
+  insert
+    select $ap <gr:calls-in> $b
+    from <rmi://localhost/server1#toscanaj>
+    where
+      $a <gr:calls> $b and
+      $a <gr:in-rt> $ap 
+  into <rmi://localhost/server1#toscanaj>
+  ;
+  insert
+    select $a <gr:calls-in> $bp
+    from <rmi://localhost/server1#toscanaj>
+    where
+      $a <gr:calls> $b and
+      $b <gr:in-rt> $bp 
+  into <rmi://localhost/server1#toscanaj>
+  ;

@@ -1,0 +1,7 @@
+        select
+          $n <gr:is-member> <gr:n>
+        from  
+          <rmi://localhost/server1#toscanaj> 
+        where 
+          $n <gr:in> <gr:gnu.trove.TLongObjectHashMap>
+;

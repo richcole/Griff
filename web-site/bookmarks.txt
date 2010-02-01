@@ -1,0 +1,20 @@
++++ Bookmarks
+
+Examples of Nice CSS Styles
+
+  - http://www.gadgetopia.com/
+
+Blog Articles
+
+  - [Thoughts on
+    KDE][http://blogs.qtdeveloper.net/archives/2005/08/03/some-basic-thoughts-about-kde-4/]
+    This article makes some good points about usibility. On point
+    boils down to: understand what the user wants to do 90% of the
+    time and support that.
+
+    An example is an icon view that when it contains a number of
+    picutures gets a button that says: display as slidshow.
+
+    There is also the suggestion that main windows be decorated with
+    folders and panes that scroll out rather than making heavy use of
+    dialogue boxes.

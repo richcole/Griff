@@ -1,0 +1,18 @@
+This is currently a placeholder.
+
+Configuring:
+
+  ./configure --prefix=/usr/local
+
+Compilation:
+
+  make
+
+Installation:
+
+  make install
+
+To construct a binary package:
+
+  make binary_tgz_package
+

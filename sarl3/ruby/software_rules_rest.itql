@@ -1,0 +1,19 @@
+#
+# These next two are because in-rt is not reflexive yet
+#
+  insert
+    select $ap <gr:calls-in> $b
+    from <rmi://localhost/server1#toscanaj>
+    where
+      $a <gr:calls> $b and
+      $a <gr:in-rt> $ap 
+  into <rmi://localhost/server1#toscanaj>
+  ;
+  insert
+    select $a <gr:calls-in> $bp
+    from <rmi://localhost/server1#toscanaj>
+    where
+      $a <gr:calls> $b and
+      $b <gr:in-rt> $bp 
+  into <rmi://localhost/server1#toscanaj>
+  ;

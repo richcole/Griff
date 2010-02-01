@@ -1,0 +1,24 @@
++++ RJL Latest
+
+The latest thing I'm discovering is C#, mono and the .NET
+framework. There is a new programming language called
+[Boo][http://boo.codehaus.org/]. Boo is in the space of languages
+supporting both dynamic and static typing.
+
+The other cool thing is
+[Coco/R][http://www.ssw.uni-linz.ac.at/Research/Projects/Coco/] which
+is a compiler compiler with bindings for C#, C++, and Java. I just
+read the manual and it is way cool. It has been really well done and
+I'm keen to try writing a grammar parser for RJL in C#. On the flip
+side, [LLVM][http://llvm.cs.uiuc.edu/] the other cool technology the
+become prominent recently, has a C++ interface which may be difficult
+to access from C#.
+
+In older news there are the pages that I've written about RJL so far.
+  - [RJL Abot][rjl_about.html]
+  - [RJL To Machine Code][rjl_to_machine_code.html]
+  - [RJL Synatax][rjl_syntax.html]
+
+
+
+

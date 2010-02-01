@@ -1,0 +1,36 @@
+
+  _a is-a rule, 
+  _a has-premise "_a _rt _b _rt _c, _r has-tr-closure _rt.",
+  _a has-conclusion "_a _rt _c.".
+
+  _a is-a rule,
+  _a has-premise "_a _r _b, _r has-ref-closure _rr.",
+  _a has-conclusion "_a _rr _a, _b _rr _b.".
+
+  _a is-a rule, 
+  _a has-premise "_a _r _b, _r implies _rt.",
+  _a has-conclusion "_a _rt _b.".
+
+  calls has-tr-closure calls-t.
+  extends has-tr-closure extends-t.
+  implements has-tr-closure implements-t.
+  implements implies is-derived-from.
+  extends implies is-derived-from.
+  is-derived-from has-tr-closure is-derived-from-t.
+  in has-tr-closure in-t.
+
+  has-tr-closure implies implies.
+  has-ref-closure implies implies.
+
+  is-derived-from-t has-ref-closure is-derived-from-rt.
+  in-t has-ref-closure in-rt.
+
+  calls-t implies depends.
+  is-derived-from-t implies depends.
+  
+  depends has-tr-closure depends-t.
+  
+  _a is-a rule,
+  _a has-premise "_a in-t _b, _a depends _c in-rt _d.",
+  _a has-conclusion "_b depends _d.".
+  

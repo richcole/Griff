@@ -1,0 +1,50 @@
+body {
+  background-color: #CDD3BC;
+  background-repeat: repeat-x;
+  font-family: Arial
+}
+
+p    { text-align: justify; }
+span { text-align: justify; }
+
+.banner {
+  position: absolute; left: 0%; top: 0px; 
+  height: 6.5em; width: 44em; 
+  background-image: url(mondrian.jpg);
+  color: black;
+  margin: 10px 10px;
+  border: thin solid;
+}
+
+.banner h1 {
+  margin-top: 0.2em;
+  margin-left: 0.5em;
+  font-size: 4.16em;
+}
+
+.middle {
+  position: absolute; left: 10em; top: 7.8em; 
+  width: 34em;
+  color: black; 
+}
+
+.left {
+  position: absolute; left: 0pt; top: 7.8em; 
+  width: 8em; 
+  list-style: none;
+  color: black;
+  border-right: thin solid; 
+  padding-left: 0.65em;
+}
+
+.left ul { 
+  list-style: none; 
+  margin-left: 0em;
+  padding-left: 1em;
+  text-indent: -1em;
+  font-family: Arial
+}
+
+.left p {
+  margin: 0.1em 0.1em 0.1em 0.1em;
+}

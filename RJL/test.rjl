@@ -1,0 +1,74 @@
+class 'a Parser 
+  def one(x: 'a)
+  end
+
+  def two(x: ('a) Scanner)
+  end
+
+  def three(x: 'a Scanner)
+  end
+
+  def four(x: 'a Parser)
+  end
+
+  def five(x: 'a 'b Parser)
+  end
+
+  def two x: 'a ('b Parser) Scanner
+  end
+
+  def one x: 'a List -> 'b List,
+      y: 'a * 'b -> ('b List -> 'c)
+  end
+
+
+end
+
+class 'a Parser
+  def one x: 'a
+  end
+  def two(x: 'a)
+  end
+  def three x
+  end
+  def three x: 'a Parser, y: 'b Parser
+  end
+  def one x: 'a,
+    y: 'b
+  end
+end
+
+class 'a Stack
+  def push(x: 'a)
+    push(x)
+  end
+
+  def push(x: 'a, y: 'b)
+    x + y
+  end
+
+  def some
+    push(x + y)
+    x + push(x + y)
+    x.y(z) + y
+    puts(x) - x
+    y + x.puts
+    puts(x.y)
+    x()()
+    x < y
+    x += 1
+    x..y
+  end
+  def some
+    1..2
+  end
+
+  def test
+    if x < y then 
+      x += 1 
+    end
+    for x in 1..2 do
+      x.y
+    end
+  end
+end

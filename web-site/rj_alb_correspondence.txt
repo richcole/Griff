@@ -1,0 +1,148 @@
++++ Some Selected Correspondence between RJ and ALB
+
+> Had forgot that you were using ruby.  It would be great to catch up some
+> time and talk about the differences, because a lot of what you mention
+> sounds similar to some of the good things in Python.
+
+
+It would be good to compare notes. As you said once before a lot of
+learning a new language is investing time in the libraries.
+
+
+> I would say that Python is actually quite efficient.  It has an
+> optimised hash table for the dictionaries, and being me I love nothing
+> more than a good map!  Once you realise the math directly as set
+> comprehensions, the evaluation of complex iterations side steps most of
+> the inefficiency.  Remember that dynamically scoped languages must set
+> up a new symbol table inside each block, so loops can be costly.
+> Furthermore, newer python (2.4) returns a generator in place of a
+> greedily evaluated list.  Just think lazy evaluation.  You can write
+> things that look like set comprehensions, but have them evaluated
+> element by element.
+> 
+> > I'm a ruby man as I think you may know. I just love blocks (a la 
+> > smalltalk), e.g.
+> > 
+> > list_box = ListBox.new
+> > for i in button_array.range do
+> >   b[i].on_click { list_box.append("Item From Button #{i}") }
+> > end
+> 
+> 
+> I really do not know SmallTalk.  What are blocks?  I assume they are a
+> form of dynamic binding, and the brace enclosed code in your example.
+> It looks like a  sort of lambda expression without any parameters.
+> 
+Yep a block is basically a lambda expression, but it is also an object. In an oo environment blocks have a decidely different character to lambda expressions in a functional environment.
+
+Irb is a ruby interpreter. It prints out the value of each statement as you do. People use it do demonstrate how ruby works.
+
+---
+irb(main):001:0>  a = 1
+=>  1
+irb(main):002:0>  b = Proc.new { puts "a=#{a}" }
+=>  #<Proc:0x4028e528@(irb):2> 
+irb(main):003:0>  a = 2
+=>  2
+irb(main):004:0>  b.call
+a=2
+---
+
+Lets try that in Ocaml which has lambda expressions (the #'s are the
+prompt from ocaml):
+
+---
+# open Printf ;;
+# let a = ref 1 ;;
+val a : int ref = {contents = 1}
+# let b = fun () ->  printf "a=%d\n" !a  ;;
+val b : unit ->  unit = <fun> 
+# let _ =
+  a := 2;
+  b ()
+;;     
+a=2
+- : unit = ()
+---
+
+So we got the same result. Thing is in ruby everything is a reference and that suits me just fine. In Ocaml you have to explicitly declare references and that is something I can do without.
+
+> As an aside, I have been playing with JavaScript and love the dynamic
+> scoping of that language.  It is actually self!  In JS the above would
+> be:
+> 
+>         list_box = new ListBox;
+>         for ( var i = 0; i < length(button_array); i++ ) {
+>                 b[i].addEventListener(
+>                         'click',
+>                         function (event) { list_box.append("Item From Button #{i}"); },
+>                         false
+>                 )
+>         }
+> 
+> Again the function enjoys the current symbol table.  Each function call
+> is a closure that persists until all references to elements in its
+> symbol table are collected.
+
+Yeah it is way cool isn't it. I've been reading some of the Self
+papers recently. You pay very heavily though in the optimiser for
+having to allocate stack frames on the heap.
+
+> A JS object constructor is a function call.  The local variables of the
+> function are the private data members of the object, and the local
+> functions of the function are the private methods.  An object has access
+> to a prototype dictionary that advertises public methods for all objects
+> constructed by the same function.  It can be extended.  Its all a bit
+> esoteric for a language to be used by web monkeys!
+
+It is just plain excellent. Sun snapped up all the Self researchers, it is good to see they subverted the system :)
+
+> > My only grip as you'll see on my webpage is that Ruby being a 
+> > traditional smalltalk derivative has no static typing at all. That makes 
+> > is just plain hard work for all involved, library programmer, library 
+> > user, and optimiser. It also doesn't use operating system threads and so 
+> > all threads get blocked by system calls.
+> 
+> 
+> Sort of yes and no on that one.  At one level it is great just to be
+> able to say things like
+> 
+>         l[i]
+> 
+> and not care whether l is a dictionary or a list or an array.  A lot of
+> noise in C++ et al, is just crap taking care of trivial differences.
+> 
+> Higher than that, I think you have to start using assertions anyway, so
+> why not chuck in some stuff about type signatures: this object promises
+> to implement this interface, etc.
+
+We are in agreement. I'm arguing for interfaces, but as I argue in my
+programming language manifesto
+[(1)][http://kvo.itee.uq.edu.au/~rcole/griff/programming_language_manifesto.html]
+I think there should be a type Unknown that is dynamically typed.
+
+I also think that interfaces should be simply conjuctive, so one can say:
+
+---
+  a: ISet ^ ICloneable
+---
+
+I think that types (interfaces) should be seen as descriptions that get progressively more specific. The logic of a program becomes quite interesting, and possibly for some setups undecidable, due to method calls which impose additional constraints, .e.g
+
+---
+  def one(a: IA, b: IB)
+    a.doSomething(b)
+  end
+---
+
+How much help do we give the programmer if the method doSomething
+takes a specialisation of IB? Do we help them out in the IDE? If so
+how, should the type constraint on the argument to doSomething be
+relaxed, should the variable b have its type constricted to match
+doSomething?
+
+This is what I envisage, a programming language that supports design
+evolution somehow in a manner similar to what you were doing for
+architects in your PhD.
+
+

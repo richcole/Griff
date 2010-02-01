@@ -1,0 +1,17 @@
+Notes on making a smoke wrapper for a custom widget
+
+  1. Make a copy of the smoke/qt directory called smoke/sarl
+  2. Edit the configure.in.in file to change smoke/qt to smoke/sarl
+     - what is Xqt and X$kde_build_libsmoke where else is it defined
+  3. Edit smoke/configure.in.in. Add sarl to "qt kde"
+
+
+Starting again:
+
+  1. Unpack the debian source
+     > dpkg-source -x kdebindings_3.3.2-1.dsc kdebindings-3.3.2
+
+  2. Edit configure to change the "qt kde" to "sarl qt kde"
+     
+
+  3. 

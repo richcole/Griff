@@ -1,0 +1,5 @@
+select $p 
+  from <rmi://localhost/server1#toscanaj>
+where
+  $p <gr:is-a> <gr:package> 
+;

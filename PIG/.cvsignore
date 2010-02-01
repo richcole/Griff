@@ -1,0 +1,12 @@
+projects.mak
+*.byte
+*.exe
+*.cm*
+*.dep
+*.tree
+*.lex
+action_lang_parse.mli
+pmm_lang_parse.mli
+sort_objects.tcl
+wiki_lang_parse.mli
+

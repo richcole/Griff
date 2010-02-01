@@ -1,0 +1,5 @@
+select $a $b
+  from <rmi://localhost/server1#toscanaj>
+where
+  $a <gr:inherits-rt> $b and $b <gr:in-rt> <gr:ontorama>
+;

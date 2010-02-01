@@ -1,0 +1,431 @@
++++ RJL Syntax
+
+++++ Attributes on methods
+
+It may be usefull to have methods on attributes. This is a different
+issue to having support for Aspect Oriented Programming.
+
+---
+class 'a ResourcePool
+  def get_resouce: 'a [private, synchronize]
+    while _free_list.is_empty { self.wait }
+    i = _free_list.pop
+    return _resources[i]
+  end
+end
+---
+
+The difference here is that the method attributes follow after the
+method definition. Another possibility is to place them on a
+subsequent line.
+
+---
+class 'a ResourcePool
+  def get_resource: 'a 
+    [private, synchronize]
+    while _free_list.is_empty { self.wait }
+    i = _free_list.pop
+    return _resources[i]
+  end
+end
+---
+
+This second option looks less cluttered than the previous
+version. However it has the difficulty that it looks just like the
+expression for an array. Perhaps a better syntax is the following:
+
+---
+class 'a ResourcePool
+  def get_resource: 'a 
+    attributes :private, :synchronize
+    while _free_list.is_empty { self.wait }
+    i = _free_list.pop
+    return _resources[i]
+  end
+end
+---
+
+The attributes becomes a reserved word. Using syntax highlighting the
+reserved word can be emphasised. Having more reserved words could make
+programming more difficult as these words cannot be used for variables
+or methods.
+
+Even better is rather than having labels as in ruby to use the
+:private only for attributes applied to methods, classes and such.
+
+---
+class 'a ResourcePool
+  def get_resource: 'a
+    :private, :synchronized
+    while _free_list.is_empty { self.wait }
+    i = _free_list.pop
+    return _resources[i]
+  end
+end
+---
+
+++++ Functions
+
+It should be possible to define functions. Sometimes one wants to
+define functions that are not assigned to any class.
+
+---
+def fold(lst: 'a Enumerable, fun: 'b * 'a -> 'b, z: 'b)
+  for x in lst { z = fun(z,x) }
+  return z
+end
+---
+
+This function could have been added onto an extension of Enumerable as in
+
+---
+  module 'a Enumerator
+    def fold(z: 'b, fun: 'b * 'a -> 'b)
+      each { x | z = fun(z, x) }
+    end
+  end
+
+  [1, 2, 3].fold(0) { z, x | z + x }
+---
+
+We note here that the blocks need to return the last expression in order
+to allow for both returns and non-local returns.
+
+We also note the use of extended typing information. Can the method
+call to plus be checked though? It can be checked once the type 'a has
+been nailed down as it has in the above expression. 
+
+Lets look at another example of typing.
+
+---
+  a = []    // type of a is Object Array
+  a.push(1) // type remains Object Array since push(o: Object) matches
+
+  a.fold(0) { z, x | z + x } 
+---
+
+Conside the final expression. Passing 0 to fold will bind Int to 'b,
+and so to z. Since z is an Int, Int will be bound to x, and so to
+'a. Now since 'a is also in the type of a, a will become Int Array,
+and a type check will be extended to push.
+
+
+++++ Expression Syntax: Method Calls
+
+Having both blocks and hash tables introduced using {} is a
+complication for the compiler. There are however not many more options
+for delimiters. Having single character delimiters means that
+delimiters can be nested as required.
+
+Nesting with regard to hash tables is suspicious. Something like:
+
+---
+  a = [{'a' => ['1', '2']}, {'b' => { 'c' => 'd' }}]
+---
+
+Such structures are a bit weird to say the least. It is not clear how
+the ruby parser distinguishes between hashes and blocks.
+
+Another problem is how does the syntax for method calling work, since
+method calls don't require brackets it can get pretty nasty I think.
+
+---
+  puts (a + b), c
+---
+
+How about the following:
+
+---
+.  <methodcall> ::= <ident> <expr> { <comma> <expr> }*
+.  <methodcall> ::= <ident> '(' <expr> { <comma> <expr> }* ')'
+---
+
+There is a complication since methods should be able to return
+multiple values, and we would also like to support hash tables and
+named parameters.
+
+---
+  grab :x => 2.3, :y => 8.9
+---
+
+So an argument expression can be one of these mapping structures. The
+mapping structures also pop up in hash tables.
+
+---
+.  <mapping> ::= <expr> '=>' <expr>
+.  <mapping_list> ::= . | <mapping> { <comma> <mapping> }*
+.  <hash> ::= '{' <mapping> '}'
+.  <block> ::= '{' '|'? <args> '|' <stmt_list> '}'
+---
+
+In the block production the first '|' is optional. So for example one
+can have:
+
+---
+  (1 .. n).each { x | puts x }
+---
+
+In the above expression the brackets are cosmetic to make the
+expression easier to read. The '.' operator binds last, but not after
+itself.
+
+---
+  1 .. n . sort { x | x < 10 }, :ascending => true
+---
+
+This reduces to
+
+---
+  [call [call, 1, .., n], sort, [block ...], [named_arg, :ascending, true]]
+---
+
+It is clear that the parse tree will need to be a bit xml
+like. I.e. it should be a tree in which the nodes are typed, and the
+branching factor is variable, and there are constraints limiting the
+types of tree that can be produced.
+
+A process of walking the expression tree for the program can then
+hopefully derive flesh the expressions with type information.
+
+++++ Syntax for classes
+
+---
+.  <stmt_end>   ::= '\n' | ';'
+.  <class_decl> ::= 
+    'class' <type_params> <name> [ <parents> ] <stmt_end>  
+       { <classdef> }* 
+    'end'
+.  <typeparams> ::= <type_param> { , <type_param> } *
+.  <class_def>  ::= <method_def> | <field_def> | <attribute> 
+--- 
+
+Class, like methods can have attributes. So for example we could have:
+
+---
+  class 'a, 'b Map
+    # Implements a mapping from a domain objects of type 'a to a range of 
+    # objects of type 'b. The map can be coerced into a set in which case
+    # it is interpreted as a relation expressing a functional dependence.
+
+    attribute :public
+  end
+---
+
+There is the question of whether the language should admit such things
+as invarients, preconditions, postconditions, or even comment blocks.
+
+++++ Module and Mixins
+
+Hierarchical name spaces can be usefull but they can also be tiresome,
+especially when one want to pick up classes from various packages. Let's
+look at some examples.
+
+---
+  package net.sf.griff.sarl3.test 
+
+  use std.collection, std.net
+  use net.sf.griff
+---
+
+Each module should start with a statement of the package
+name. Packages are expected to align with a directory
+structure. Modules are essentially names spaces enfolding classes and
+functions.
+
+The rule for resolving class and function names is: find the first
+package which contains a matching class or function and use that.
+
+Should there be support for runtime configuration via
+factories. Perhaps such functionality should be brought in by the
+standard library.
+
+---
+  package std.config
+
+  _class_mapping_config_string = "std.config.class_mapping"
+
+  def initialize
+    begin
+      for class_name, class_alias in
+        Config.resolve(class_mapping_config_string)
+      do
+        begin
+          class_object = load_class class_name
+          alias class_alias, class_object
+        rescue e: NoMatch
+          log_error \
+            "Missing configuration string for #{_class_mapping_config_string}"
+        rescue e
+          log_error \
+            "Problem loading class mapping #{e}"
+        end
+      end
+    rescue e: NoMatch
+      log_error \
+        "Missing configuration string for #{_class_mapping_config_string}"
+    resuce e: MethodMissing
+      log_error \
+        "Invalid configuration for #{_class_mapping_config_string}"
+    end
+  end
+---
+
+In the above, a list of pairs is extracted from the configuration
+space. The configuration space should probably be an xml file and the
+thing returned should probably be a dom. Better though is to use YAML
+which admits lists of strings for example.
+
+This will allow the std.config class upon initialisation to register
+class aliases according to a mapping defined in the configuration.
+
+The rescue and logging code is larger than one might expect. Another
+possibility is to use a function that logs and ignores expections.
+
+---
+  package std.config
+  use std.exception.logging
+
+  _class_mapping_config_string = "std.config.class_mapping"
+
+  def initialize
+    log_exception {
+      for class_name, class_alias in
+        Config.resolve(class_mapping_config_string)
+      do
+        log_exception {
+          class_object = load_class class_name
+          alias class_alias, class_object
+        }
+      end
+    }
+  end
+---
+
+It is potentially possible to attach to the code some logic for
+decoding the exceptions that may be raised by the block of code to
+make messages that are meaningfull to the user. There are different
+perspectives: library programmer, application programmer, application
+user. Another idea: In a logging framework one may want to turn some
+logging off, especially at the code level.
+
+The above code example raises an interesting question: if blocks are
+so readily usefull, then how would they in practice be
+optimised. First lets look at the definition of log_exception.
+
+---
+  def log_exception(block: VoidBlock)
+    begin
+      block.call
+    rescue e: Exception
+      log "Exception Raised: e.to_s"
+    end
+  end
+---
+
+This definition however obscures the stack trace perhaps, the point at
+which the exception was raised and caught. It would be nice to have
+access to the calling context. It is this that all those macros in the
+programming language Nice are targetted at (amongst other things).
+
+The type VoidBlock is assumed to represent the type "void, void
+Block", that is a block that takes no parameters and returns
+nothing. Also we assume that Exception is the root of all
+exceptions. Basically you can't throw something which doesn't derived
+from Exception.
+
+---
+  def log_exception(block: VoidBlock, context: implicit CallingContext)
+    begin
+      block.call
+    rescue e: Exception
+      log context.to_s + e.to_s
+    end
+  end
+---
+
+Here we assume that an argument context representing the context in
+which a method is called can be made available. This is an aid to
+debugging. Another mechanism to yeild the calling context would be to
+make it available through some standard function.
+
+---
+  def log_exception(block: VoidBlock)
+    begin
+      block.call
+    rescue e: Exception
+      log e.to_s
+      log System.callstack[1].to_s + "  in this context."
+    end
+  end
+---
+
+So the function is passed a block which it duely executes. Since the
+method is likely to be exactly resolved and it is relatively short, it
+can most likely be inlined. Hopefully this would lead to the inlining
+of the call to block.
+
+It is interesting to ask how this would be handled by LLVM, but that
+is a question for later.
+
+++++ Mathematical Notation
+
+The previous example of using blocks and the possibility for
+optimisation given that the functions being called can be resolved.
+
+---
+  def sum range : 'a Iterable, func: 'a -> 'b Sumable, x: 'b = 0.0
+    returns 'b
+    range.each { y | x += func(y) }
+    return x
+  end
+
+  interface 'a Sumable
+    def += (x: 'a) returns Void
+  end
+
+  class Integer < Float Sumable, Integer Sumable
+    ...
+  end
+
+  class Float < Float Sumable, Integer Sumable
+    def += (x: Float)
+      # builtin
+    end
+
+    def += (x: Integer)
+      self += x.to_f
+    end
+
+    def +(x: Integer)
+      return self + x.to_f
+    end
+  end
+---
+
+Typing the function becomes rather generic. One can ask to what extent
+can type inference be used. Particularly if it is possible to add for
+example an integer to a float.
+
+Calling a method becomes more complex because dispatch is based on
+both the incident class and the argument types. If one also admits
+implicit conversion the calls becomes hopelessly ambigious. On the
+other hand, argument based dispatch becomes a problem when linked with
+hierarchy perhaps. Although it can be resolved by defining a search
+order for the dispatch. Diamonds have always been a problem, but if
+they are strictly ordered by selection of the first match, then the
+dispatch is well defined, even if non-obvious in some cases, for
+example when a class extends both Integer and Float, which arguably is
+asking for trouble.
+
+Anyway it now becomes possible to call the sum function (I think).
+
+---
+  result = sum 1 .. n, { x | x*x }, 1.0
+---
+ 
+++++ Unicode
+
+The sourcecode should be a default unicode encoding. No other
+encodings should be allowed for the source code. The string handling
+libraries however should support unicode.
+

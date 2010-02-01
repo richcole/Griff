@@ -1,0 +1,12 @@
+rj_cgi -
+  Copyright, Richard Cole 2004
+  
+This is a small library containing a single module. It requires GODI
+to be compiled and installed.
+
+Compilation:
+  make
+
+Installation:
+  make install
+

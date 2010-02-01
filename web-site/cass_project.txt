@@ -1,0 +1,77 @@
++++ CASS - Conceptual Analysis of Software Structure
+
+The CASS Project is concerned with the application of
+[FCA][fca_topic.html] to understanding of software structure.
+
+CASS is one of several research efforts to apply FCA to the
+understanding of software structure and differs from those in various
+ways.
+
+The hallmarks of the CASS approach are:
+
+  - *Many perspectives* When organising software structure (an really
+    anything for that matter) there are many competing
+    perspectives. In human thinking there is always a context which
+    promotes some attributes over others. For example when looking for
+    an object to throw the shape is important, but when looking for
+    something to eat the taste and readability is important.
+
+  - *Small lattices.* The user is only ever confronted with small
+    lattices that summarise some aspect of the software structure.
+
+  - *A dislike of data mining* CASS is for visualisation, the
+    interpretation of the structure is up to the human. It is not
+    performed by the machine. CASS does not seek to either (i)
+    automatically restructure code, or (ii) automatically identify
+    areas of good or bad code. Rather it seeks to provide a tool
+    whereby humans can interpret diagrams to understand structures
+    that exist in their code.
+
+  - *Navigation Spaces* CASS uses navigation spaces to combine
+    relations and hierarchies. Hierarchies are essentially partial
+    order relations that can be interpreted by humans meaningfully as a
+    kind of implication. Relations are all the other relations and may
+    have cycles.
+
+The source directory griff/cass contains an old version of CASS. The
+new version has been integrated into the sarl library (and should
+perhaps also be split out again).
+
+Currently the CASS code copsists of ruby files and it also
+serves as an example of how to wrap to construct a custom application.
+
+++++ Features to Implement for CASS
+
+  1. Make the navigation spaces a configuration option rather than
+     being directly coding them in Ruby.
+
+     - probably requires then making also an editor for these configuration
+       operations
+
+  2. Fix the back button and connect the forward button - more state
+     needs to be stored for the back button to work, in particular the
+     state information stored in the database is not being modified
+     when the user goes back (it needs to be modified) but should the
+     history also be stored in the database (anonymous nodes are bad,
+     maybe the nodes can be given determined names).
+
+  3. Add a wizard which allows additional JAR to be inserted into the current
+     project.
+
+  4. Allow the concept of multiple projects. This is supported quite
+     well by Kowari, but a little thinking about it needs to be done.
+
+  5. Add support for distributive closure
+
+  6. Add support for nesting navigatin points (how should such a thing
+     be accomodated)
+
+  7. Make the navigation operations higher level, e.g. focus on should
+     probably unfold the attribute as well.
+
+  8. Add an option to navigate to the source code (connect to Eclipse
+     for this, or perhaps to a java doc source).
+
+
+
+

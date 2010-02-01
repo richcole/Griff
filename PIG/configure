@@ -1,0 +1,82 @@
+#!/bin/bash
+#
+# Adhoc Configure Script
+#
+# PIG essentially depends on g++, tcl, a few system libraries, and ocaml thus
+# the demands for autoconfiguration are not particularly high.
+#
+# Since autoconf is a big monster and I don't want to use it I wont. Instead
+# there is this simple configure script.
+
+# Usage
+
+function usage () {
+  echo "Usage: configure <args>"
+  echo "  Allowed arguments are:"
+  echo "    --prefix=<prefix>  : <prefix> is the root install directory"
+  echo "    --binprefix=<prefix>  : <prefix> is the root install directory"
+  exit 65
+}
+
+# Process command line arguments
+
+for arg in $@ ; do
+  case "$arg" in
+    "")          usage ;;
+    --prefix=*)  PREFIX=`echo $arg | sed -e 's/^--prefix=//'` ;;
+    --binprefix=*)  BINPREFIX=`echo $arg | sed -e 's/^--binprefix=//'` ;;
+  esac
+done
+
+
+# Look for a working version of programs
+
+function check_for () {
+  if [ ! "$1" ] ; then
+    echo "Internal Error: check_for called with the wrong number of args"
+    return -1
+  fi
+  echo -n "Looking for $1...  "
+  PROGN=`which $1`
+  if [ "$PROGN" ] ; then
+    echo "$PROGN"
+  else
+    echo "Error"
+    echo "Couldn't find $1 in your path." 
+    echo "You need $1 installed to compile this program."
+    exit 0
+  fi
+}
+
+check_for "tclsh" 
+check_for "ocamlfind"
+check_for "uname"
+check_for "install"
+
+# setup config_vars as a shell script
+if [ ! "$PREFIX" ] ; then
+  PREFIX=/usr
+fi
+if [ ! "$BINPREFIX" ] ; then
+  BINPREFIX=$PREFIX/bin
+fi
+
+echo "Creating config file config_vars.sh"
+rm -f config_vars.sh
+
+VAR="PREFIX=$PREFIX"
+echo "  $VAR"
+echo $VAR >> config_vars.sh
+
+VAR="BINPREFIX=$BINPREFIX" 
+echo "  $VAR"
+echo $VAR >> config_vars.sh
+
+echo ""
+echo "To build the program run make"
+echo "Then to install run make install (potentially as root)"
+
+
+
+
+  

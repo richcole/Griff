@@ -1,0 +1,18 @@
+# + Comments Format
+#
+# All comments are precceded by a hash symbol which only has while
+# space preceeding it on the line
+#
+# The format of comments is a Wiki format. One can use WikiWord which get
+# translated into lower case.
+#
+# There are also keywords that are identified with an \@ symbol, for example
+# \@SeeAlso and \@seeAlso. Capitialisation is ignored for symbols. Special
+# formatting characters such as \@ can be escaped using \\\@ for example.
+#
+# Some commands have arguments that follow them, for example @seeAlso is 
+# followed by a WikiWord.
+#
+# For now some random comments as they are through of are included in
+# RandomThoughts
+#

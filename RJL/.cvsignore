@@ -1,0 +1,8 @@
+*.dep
+*.exe
+*~
+*.mak
+Parser.h
+Parser.cpp
+Scanner.h
+Scanner.cpp

@@ -1,0 +1,9 @@
+#!/bin/bash
+A=$1"_a.ascii"
+E=$1"_e.ascii"
+L=$1"_l.ascii"
+if [ -e $L ] ; then
+  exec ./layout.exe $A $E $L
+else
+  exec ./layout.exe $A $E
+fi

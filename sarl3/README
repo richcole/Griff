@@ -1,0 +1,9 @@
+To install you need the following debian testing packages installed.
+
+ sudo apt-get install tcl8.4 ruby1.8-dev tclsh g++ gtk2.0-dev gc-dev
+
+The process is then make; make install. If this doesn't work the first
+port of call is build_config.txt which contains some variables which
+can be set.
+
+

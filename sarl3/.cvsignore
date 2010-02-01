@@ -1,0 +1,13 @@
+*.dep
+moc*.cpp
+*.o
+*.exe
+*.so
+*.a
+*.mak
+sarl_lattice_view_gtk_marshaller.c
+sarl*.tar.gz
+
+
+
+

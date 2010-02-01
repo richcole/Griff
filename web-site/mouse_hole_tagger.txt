@@ -1,0 +1,20 @@
++++ MouseHole Tagger
+
+I found a program called MouseHole on Delicious while browsing Ruby
+stuff. It is a cool idea. It is basically a local proxy to run your
+requests though so they can be acted on by ruby scripts. That opens up
+a lot of possibilities. One possibility is to have some GUI component
+(or even web controlled component) that tracks topics. You could mark
+in such a browser that you are browsing a particular topic, then all
+pages visited can be marked as part of a search on this topic, of
+course the usual visit to Delicious can be used to add extra tags.
+
+The system could also be used to try to learn tags for given
+page. Tagging systems have high precision but low recall. Often the
+tagger (e.g. doesn't think up all the tags that are relevent to a
+given page). One way to fix this is with some logical system defined
+over the tags. Another way to fix this is with suggestions, maybe even
+some sort of simple probabilistic framework, e.g. P(x|v), such a
+prob. system however will face immediately the sparse data problem.
+
+

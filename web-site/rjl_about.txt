@@ -1,0 +1,130 @@
++++ About RJL
+
+RJL stand's for RJ's language. It is a long running and little
+progressed project to construct a better programming language. The
+current idea is to construct a programing language with the aesthetics
+of ruby that allows for static typing, a virtual machine, and dynamic
+typing.
+
+Here are links to other rambings about RJL.
+  - [RJL Latest][rjl_latest.html]
+  - [RJL To Machine Code][rjl_to_machine_code.html]
+  - [RJL Syntax][rjl_syntax.html]
+
+The first step is to construct some programs to demonstrate how the
+language works. There are two aspects to such programs, the code and
+the translation into class files for loading into a VM.
+
+So lets jump right in and look at the design of a resource pool for a
+multithreaded environment. This will serve to illustrate the syntax,
+and by some explaination, and also by some similarity to existing
+languages, serve to illuminate the semantics.
+
+---
+  // this is a comment
+  class 'a ResourcePool
+
+    // following a fields that get initialised, one is an array
+    // the other is a hash table (a mapping)
+    _free_list = []
+    _allocated = {}
+
+    // this is an inner class. Inner classes in RJL don't have parent
+    // pointers because that is a java cludge.
+    class UnallocatedResourceReleased 
+      // inheritance is specified with extends
+      :extends PreconditionFailure
+    end
+
+    // the initialize method is called from class.new method
+    def initialize(n: Int)
+      for i in 1..n do
+        r = yield(i)
+        _free_list << r
+      end
+    end
+
+    // by default methods are public and unsynchronised
+    def get_resource: 'a
+      :private, :synchronized  
+      while free_list.is_empty { self.wait }
+      i = _free_list.pop
+      return _resources[i] 
+    end
+
+    // when no return type is specified then the function
+    // has no return value
+    def release_resource(resource: 'a)
+      :private, :synchronised
+      if ! _allocated.is_member(a) then
+        throw UnallocatedResourceReleased.new
+      else
+        _allocated.remove(a)
+        _free_list.push(_resource)
+        self.notify
+      end
+    end
+
+    // if a method makes a call to yield then it may accept
+    // a block as the last argument
+    def with
+      r = get_resource
+      begin
+        yield(r)
+      finally
+        // the finally block is always called, no exceptions 
+	// (cept maybe if the machine is turned off or the process 
+	// gets viciously killed).
+        release_resource(r)
+      end
+    end
+  end
+
+  class ResourcePoolUnitTest 
+    :extends UnitTest
+
+    def test_two_threads
+      pool = ResourcePool.new 5, { i | i }
+      n    = 10
+      xs   = Array.new_copy 0 n
+      ts   = []
+      for i in 1..n do
+        ts = Thread.new { 
+          sleep(i)
+          pool.with { 
+            | resource_id | 
+            xs[resource_id] = resource_id
+            sleep(i) 
+          }
+        }
+      end
+      begin
+        for i in 1..n do
+          Thread.timeout 500, { ts.wait_for_termination } 
+        end
+      catch e: TimeoutException
+        return TestFailure.new "Deadlock on thread #{i}"
+      end
+      for i in 1..n do
+        if xs[i] != i then
+          return TestFailure.new "Thread #{i} failed to set the right result."
+        end
+      end
+
+      return TestSuccess
+    end
+  end
+---
+
+The unit test implemented here doesn't not test a number of error
+conditions. Testing or proving that deadlock cannot occur is
+difficult. The process does setup contension since it construct
+quickly 10 threads which all try to access a value from the
+pool. There is also a race condnition since the variable xs is not
+protected (assuming that Array does not have a thread safe
+implementation).
+
+Thread safety is very expensive as we have seen. Even when there is a
+single thread obtaining a condition variable is potentially expensive.
+      
+    

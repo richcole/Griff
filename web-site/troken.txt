@@ -1,0 +1,44 @@
++++ Troken
+
+The idea behind troken is a kind of delicious for the
+desktop. Directories are important notions in file systems because
+they demarcate boundaries. For example the cairo source code is
+encapulated in a directory tree that provides some rudimentary
+organisation over the structure.
+
+For latex also one needs a directory containing the source of a
+paper. The various figures etc.
+
+One needs facets however and one wants to inherit facets from
+directories and from activities. E.g. if I make a directory as
+realm::academic, then I want all files in that directory to inherit
+the tag realm::academic. Some tags can be derived from the file name,
+e.g. paper.tex can inherit the tag file-type::latex.
+
+When retrieving files there are defaults that one wants the computer
+to know about, e.g. these are my favorite paths through the facet
+space, e.g. realm::academic, realm::personal, file-type::latex
+
+Another tag could be realm::system to denote files that are managed by
+dpkg.
+
+One wants the tagging system to automatically tag files, to track
+their movements through the system, and to observe the users
+interaction with the files. So for example if I tag my current context
+as search-topic::sat-solvers then I want to mark all pages visited in
+this mode as relevent to the search topic, or perhaps have a quick
+button that marks them.
+
+These java script buttons make interaction with the web browser much
+easier especially since the troken server can be running locally and
+listening to user input.
+
+So there are three types of tag inference that one would like to have:
+
+  1. observation of user behaviour
+  2. dependence and exclusion between tags
+  3. agents (computer programs) that can classify objects 
+     based on their user name, content or other accessible features.
+
+One thing that would be nice is to be able to just dump files in the
+troken directory and mark them up with a few tags.

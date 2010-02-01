@@ -1,0 +1,5 @@
+RJ_CAML_RELEASE_0_1
+  This is an initial release. Some of the data structures are missing some
+  functions that people may find usefull this is because I've only
+  been writing functions when they are needed.
+

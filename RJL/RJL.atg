@@ -1,0 +1,283 @@
+#include "Lexicon.h"
+#include "TypeDecl.h"
+#include "SExpr.h"
+
+COMPILER RJL
+
+  RJL::Lexicon lex;
+
+  
+CHARACTERS
+  letter     = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".
+  ops        = "!@#$%^&*+-|/~<>?\\".
+  digit      = "0123456789".
+  underscore = '_'.
+  colon      = ':'.
+  quote      = '\''.
+  period     = '.'.
+  
+  cr         = '\r'.
+  lf         = '\n'.
+  tab        = '\t'.
+
+TOKENS
+  ident     = letter { letter | digit }.
+  attrsym   = colon letter { letter | digit | underscore }.
+  typesym   = quote letter { letter | digit | underscore }.
+  integer   = digit { digit } | digit { digit } CONTEXT ("..") .
+  float     = digit { digit } period digit { digit }.
+  nl        = lf.
+  op        = ops.
+
+COMMENTS FROM "/*" TO "*/" NESTED
+COMMENTS FROM "//" TO lf
+
+IGNORE cr + tab
+
+
+
+PRODUCTIONS
+
+RJL = { nl } [ OuterList ].
+
+OuterList = 
+  (. SExpr *decl; .)
+  Outer<decl> (. if ( decl) decl->print(std::cout, lex); std::cout << endl; .) 
+  { 
+    Outer<decl> (. if ( decl) decl->print(std::cout, lex); std::cout << endl; .) 
+  }
+.
+
+Outer<SExpr *& decl> = 
+  ClassDecl<decl>  { nl } 
+.
+
+FullTypeDeclNL<SExpr *& decl> = 
+  (. decl = 0; .)
+  FullTypeDeclPruned<decl> nl 
+.
+
+FullTypeDeclPruned<SExpr *& decl> = 
+  (. decl = 0; .)
+  FullTypeDecl<decl>
+  (. prune_levels(decl, lex); .)
+.
+
+
+TypeIdent<size_t& id> = 
+  ident   (. id = lex.index(t->val); .) |
+  typesym (. id = lex.index(t->val); .) |
+  attrsym (. id = lex.index(t->val); .)
+.
+
+Ident<size_t& id>    = ident   (. id  = lex.index(t->val); .).
+Integer<size_t& num> = integer (. num = lex.index(t->val); .).
+Float<size_t& id>    = float   (. id  = lex.index(t->val); .).
+
+TypeDecl<SExpr *& decl> =  
+  (. size_t id; decl = 0; .)
+  TypeIdent<id> (. decl = new SExpr(id); .)
+  | BracketTypeDecl<decl>
+.
+
+BracketTypeDecl<SExpr *& br_decl> = 
+  (. SExpr *decl = 0; br_decl = 0; .)
+  '(' FullTypeDecl<decl> ')' (. br_decl = decl; .)
+.
+
+TypeDeclList<SExpr *& decl>    = 
+  (. 
+     SExpr *hd_decl = 0, *nxt_decl = 0; decl = new SExpr(lex.index(":type")); 
+  .)
+  TypeDecl<hd_decl> 
+    (. if ( hd_decl ) decl->push_back(hd_decl); .) 
+  { 
+    TypeDecl<nxt_decl> 
+      (. if ( hd_decl ) decl->push_back(nxt_decl); .) 
+  } 
+.
+
+FullTypeDecl<SExpr *& decl> = 
+  (. 
+  SExpr *hd_decl = 0, *nxt_decl = 0, *decl_ret = 0; 
+  decl = new SExpr(lex.index(":type"));
+  .)
+  TypeDeclList<hd_decl> (. decl->push_back(hd_decl); .) 
+  { '*' TypeDeclList<nxt_decl> (. if ( nxt_decl ) decl->push_back(nxt_decl); .) } 
+  [ "->" TypeDeclList<decl_ret> 
+    (. 
+       if ( decl_ret ) {
+         decl->push_back(decl_ret); 
+         decl->id(lex.index(":fun-type"));
+       };
+    .) 
+  ]
+.
+
+ClassDecl<SExpr *& class_decl> =    
+  (. SExpr *type_decl, *method_decl; 
+     class_decl = new SExpr(lex.index(":class"));
+  .)
+  "class" FullTypeDeclNL<type_decl> 
+  (. class_decl->push_back(type_decl); .)
+  { 
+    MethodDecl<method_decl> 
+    (. class_decl->push_back(method_decl); .) 
+    | nl 
+  } "end" 
+.
+
+MethodDecl<SExpr *& method_decl> =
+  (. size_t name;
+     SExpr *args, *stmt_lst; 
+     method_decl = new SExpr(lex.index(":method")); 
+  .)
+  "def" Ident<name> 
+  [ ( '(' [nl] ArgDeclList<args> [nl] ')' | ArgDeclList<args> ) 
+    (. 
+      method_decl->push_back(new SExpr(name)); 
+      method_decl->push_back(args); 
+    .)
+  ] nl
+  [ 
+    StatementList<stmt_lst> (. method_decl->push_back(stmt_lst); .) 
+  ]
+  "end"
+.
+
+ArgDeclList<SExpr *& arg_decl_list> =
+  (. SExpr *arg; 
+     arg_decl_list = new SExpr(lex.index(":args")); 
+  .)
+  ArgDecl<arg>    (. arg_decl_list->push_back(arg); .) 
+  { 
+    ',' [ nl ] ArgDecl<arg>  (. arg_decl_list->push_back(arg); .) 
+  }
+.
+
+ArgDecl<SExpr *& arg_decl> =
+  (. size_t name;
+     SExpr  *type, *arg;
+     arg_decl = new SExpr(lex.index(":arg")); 
+  .) 
+  Ident<name> (. arg_decl->push_back(new SExpr(name)); .)
+  [ ':' FullTypeDeclPruned<type> (. arg_decl->push_back(type); .) ]
+.
+
+Call<SExpr *& expr, SExpr *pre> = 
+  (. size_t id = 0; SExpr *rexpr = 0, *args = 0, *op = 0; expr = 0; .)
+  (
+    ( 
+      '.' Ident<id> 
+        (. expr = new SExpr(lex.index(":method-call")); 
+           expr->push_back(pre);
+           expr->push_back(new SExpr(id));
+        .)
+        [ Args<args> (. expr->push_back(args); .) ] 
+    ) |
+    ( Operator<op> Expr<rexpr> 
+        (. expr = new SExpr(lex.index(":op-call")); 
+           expr->push_back(pre);
+           expr->push_back(op);
+           expr->push_back(rexpr); 
+        .)
+    ) |
+    ( 
+      (. expr = new SExpr(lex.index(":self-call")); 
+         expr->push_back(pre);
+      .)
+      Args<args> (. expr->push_back(args); .)
+    )
+  )
+.
+
+Operator<SExpr *& op> = 
+  ( 
+    op | "==" | ">>" | "<<" | "=>" | "->" | "<=" | ">=" | "&&" | '^' | '*' 
+       | "+=" | "-=" | "|=" | "&=" | "<<=" | ">>=" 
+       | ".."
+  )
+  (. op = new SExpr(lex.index(t->val)); .)
+.
+
+Expr<SExpr *& expr> = 
+  (. size_t id; SExpr *call = 0; expr = 0; .)
+  (
+    ( ( Ident<id> | Integer<id> | Float<id> )
+      (. expr = new SExpr(id); .) 
+      { Call<call, expr> (. expr = call; .) }  
+    ) |
+    ( '(' Expr<expr> ')' )
+  )
+.
+
+Args<SExpr *& args> = 
+  (. args = new SExpr(lex.index(":args")); .)
+  (
+    ( '(' [ ExprList<args> ] ')' ) | 
+    ( ExprList<args> )
+  )
+.
+
+ExprList<SExpr *& args> = 
+  (. SExpr *expr = 0; .)
+  Expr<expr> (. args->push_back(expr); .) { ',' Expr<expr> (. args->push_back(expr); .) }
+.
+
+IfStatement<SExpr *& stmt> =
+  (. SExpr *expr = 0, *stmt_list = 0, *else_stmt = 0; 
+     stmt = new SExpr(lex.index(":if-stmt")); 
+  .)
+  "if" Expr<expr> "then" { nl } StatementList<stmt_list> 
+  (. stmt->push_back(expr); stmt->push_back(stmt_list); .)
+  [ "else" { nl } StatementList<else_stmt> 
+    (. stmt->push_back(else_stmt); .) 
+  ] "end"
+.
+
+WhileStatement<SExpr *& stmt> =
+  (. SExpr *expr = 0, *stmt_list = 0; stmt = new SExpr(lex.index(":while-stmt")); .)
+  "while" Expr<expr> "do" { nl } StatementList<stmt_list> "end"
+  (. stmt->push_back(expr); stmt->push_back(stmt_list); .)
+.
+
+RepeatStatement<SExpr *& stmt> =
+  (. SExpr *expr = 0, *stmt_list = 0; stmt = new SExpr(lex.index(":repeat-stmt")); .)
+  "repeat" { nl } StatementList<stmt_list> "until" Expr<expr>
+  (. stmt->push_back(expr); stmt->push_back(stmt_list); .)
+.
+
+ForStatement<SExpr *& stmt> =
+  (. SExpr *expr = 0, *args = 0, *stmt_list = 0; 
+     stmt = new SExpr(lex.index(":for-stmt")); 
+  .)
+  "for" { nl } ArgDeclList<args> { nl } "in" { nl } Expr<expr> { nl } "do" { nl } StatementList<stmt_list> "end"
+  (. stmt->push_back(args); stmt->push_back(expr); stmt->push_back(stmt_list); .)
+.
+
+ExprStatement<SExpr *& stmt> =
+  Expr<stmt>
+.
+
+Statement<SExpr *& stmt> = 
+  (. stmt = 0; .) 
+  ( IfStatement<stmt> | WhileStatement<stmt> | ForStatement<stmt> | 
+    RepeatStatement<stmt> | ExprStatement<stmt> 
+  )
+.
+
+StatementList<SExpr *& list> = 
+  (. SExpr *stmt; list = new SExpr(lex.index(":stmt_list")); .)
+  Statement<stmt> 
+    (. list->push_back(stmt); .) 
+  { 
+    ( ';' | nl ) 
+    [ 
+      Statement<stmt> 
+      (. list->push_back(stmt); .) 
+    ] 
+  }
+.
+
+END RJL
+.

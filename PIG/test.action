@@ -1,0 +1,5 @@
+for "_a leq _b" do
+  assert "_b in-range leq"
+  assert "_a in-domain leq"
+  println "{_a} leq {_b}"
+done

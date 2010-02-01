@@ -1,0 +1,9 @@
+      select
+        $g $m  
+      from  
+        <rmi://localhost/server1#toscanaj> 
+      where 
+        $g <gr:calls-in> $m  and
+        $g <gr:is-member> <gr:h> and
+        $m <gr:is-member> <gr:n>
+      ;

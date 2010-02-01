@@ -1,0 +1,10 @@
+#!/bin/bash
+name=$1
+A=$name"_a.ascii"
+E=$name"_e.ascii"
+L=$name"_l.ascii"
+if [ -e $L ] ; then
+    exec ./layout.exe $A $E $L | wish display.tcl $E
+else
+    exec ./layout.exe $A $E | wish display.tcl $E
+fi    

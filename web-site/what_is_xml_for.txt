@@ -1,0 +1,17 @@
++++ What is XML for?
+
+I often wondered what is XML for. Where do the ideas come
+from. Initially I thought that XML was meant for storing data in the
+presense of an object oriented data store. But I've since discovered
+that XML is for making forms, you know those forms you have to fill in
+all the time, and XML document is simply a form that has been filled
+in.
+
+Once you understand XML in these terms then its design becomes much
+less of mystery. You get a hint from a form what the process model is
+behind it, but only a hint. Also, if one has a database then one
+copies information between the form and the database: either fill out
+the form from the database, or vice versa fill out the database from
+the form.
+
+

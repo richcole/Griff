@@ -1,0 +1,246 @@
+++ SYS COMMAND: /home/rcole/Source/PIG/retract_graph.exe /home/rcole/Sandpit/analyse_toscanaj_0_2.wiki/toscanaj "h1 has-unfolded _a." "h1 has-unfolded _a."
+-- SYS COMMAND
+++ SYS COMMAND: /home/rcole/Source/PIG/retract_graph.exe /home/rcole/Sandpit/analyse_toscanaj_0_2.wiki/toscanaj "n1 has-unfolded _a." "n1 has-unfolded _a."
+-- SYS COMMAND
+++ SYS COMMAND: /home/rcole/Source/PIG/retract_graph.exe /home/rcole/Sandpit/analyse_toscanaj_0_2.wiki/toscanaj "_a is-member h1." "_a is-member h1."
+-- SYS COMMAND
+++ SYS COMMAND: /home/rcole/Source/PIG/retract_graph.exe /home/rcole/Sandpit/analyse_toscanaj_0_2.wiki/toscanaj "_a is-member n1." "_a is-member n1."
+-- SYS COMMAND
+++ SYS COMMAND: /home/rcole/Source/PIG/execute_action.exe /home/rcole/Sandpit/analyse_toscanaj_0_2.wiki/toscanaj /tmp/form_n1.action
+-- SYS COMMAND
+++ SYS COMMAND: /home/rcole/Source/PIG/execute_action.exe /home/rcole/Sandpit/analyse_toscanaj_0_2.wiki/toscanaj /tmp/form_h1.action
+-- SYS COMMAND
+Lexicon Count: 1
+Lexicon Count: 2
+Lexicon Count: 3
+Interp Loaded
+Lexicon Count: 4
+Lexicon Count: 5
+Lexicon Count: 6
+gs={1, 2}
+new_extents={{1, 2}}
+self={{1, 2}}
+
+gs={2}
+  x={1, 2}
+  nx={2}
+new_extents={{2}}
+self={{1, 2}, {2}}
+
+gs={1}
+  x={1, 2}
+  nx={1}
+  x={2}
+  nx={}
+new_extents={{1}, {}}
+self={{1, 2}, {2}, {1}, {}}
+
+New Concept: extent={1, 2}, intent={}
+New Concept: extent={2}, intent={1}
+New Concept: extent={1}, intent={2}
+New Concept: extent={}, intent={1, 2}
+Time (up_down_sets): 0.005002 seconds
+Time (upper_covers): 0.009322 seconds
+Time (lower_covers): 0.001381 seconds
+Time (top_bottom): 0.001567 seconds
+Time (contingents): 0.005448 seconds
+reset_scale
+reset_scale
+reset_scale
+PrimeCanvas
+++ SYS COMMAND: /home/rcole/Source/PIG/retract_graph.exe /home/rcole/Sandpit/analyse_toscanaj_0_2.wiki/toscanaj "h1 has-unfolded _a." "h1 has-unfolded _a."
+-- SYS COMMAND
+++ SYS COMMAND: /home/rcole/Source/PIG/retract_graph.exe /home/rcole/Sandpit/analyse_toscanaj_0_2.wiki/toscanaj "n1 has-unfolded _a." "n1 has-unfolded _a."
+-- SYS COMMAND
+++ SYS COMMAND: /home/rcole/Source/PIG/retract_graph.exe /home/rcole/Sandpit/analyse_toscanaj_0_2.wiki/toscanaj "_a is-member h1." "_a is-member h1."
+-- SYS COMMAND
+++ SYS COMMAND: /home/rcole/Source/PIG/retract_graph.exe /home/rcole/Sandpit/analyse_toscanaj_0_2.wiki/toscanaj "_a is-member n1." "_a is-member n1."
+-- SYS COMMAND
+++ SYS COMMAND: /home/rcole/Source/PIG/execute_action.exe /home/rcole/Sandpit/analyse_toscanaj_0_2.wiki/toscanaj /tmp/form_n1.action
+-- SYS COMMAND
+++ SYS COMMAND: /home/rcole/Source/PIG/execute_action.exe /home/rcole/Sandpit/analyse_toscanaj_0_2.wiki/toscanaj /tmp/form_h1.action
+-- SYS COMMAND
+Lexicon Count: 7
+Lexicon Count: 8
+Lexicon Count: 9
+Lexicon Count: 10
+Lexicon Count: 11
+Lexicon Count: 12
+gs={1, 2, 3, 4, 5, 6, 7, 8}
+new_extents={{1, 2, 3, 4, 5, 6, 7, 8}}
+self={{1, 2, 3, 4, 5, 6, 7, 8}}
+
+gs={1}
+  x={1, 2, 3, 4, 5, 6, 7, 8}
+  nx={1}
+new_extents={{1}}
+self={{1, 2, 3, 4, 5, 6, 7, 8}, {1}}
+
+gs={2}
+  x={1, 2, 3, 4, 5, 6, 7, 8}
+  nx={2}
+  x={1}
+  nx={}
+new_extents={{2}, {}}
+self={{1, 2, 3, 4, 5, 6, 7, 8}, {1}, {2}, {}}
+
+gs={2, 3, 8}
+  x={1, 2, 3, 4, 5, 6, 7, 8}
+  nx={2, 3, 8}
+  x={1}
+  nx={}
+  x={2}
+  nx={2}
+  x={}
+  nx={}
+new_extents={{2}, {}, {2, 3, 8}}
+self={{1, 2, 3, 4, 5, 6, 7, 8}, {1}, {2}, {}, {2, 3, 8}}
+
+gs={1, 4, 5, 7, 2, 8}
+  x={1, 2, 3, 4, 5, 6, 7, 8}
+  nx={1, 2, 4, 5, 7, 8}
+  x={1}
+  nx={1}
+  x={2}
+  nx={2}
+  x={}
+  nx={}
+  x={2, 3, 8}
+  nx={2, 8}
+new_extents={{1}, {2}, {}, {1, 4, 5, 7, 2, 8}, {2, 8}}
+self={{1, 2, 3, 4, 5, 6, 7, 8}, {1}, {2}, {}, {2, 3, 8}, {1, 4, 5, 7, 2, 8}, {2, 8}}
+
+gs={1, 4, 5, 7, 2, 8}
+  x={1, 2, 3, 4, 5, 6, 7, 8}
+  nx={1, 2, 4, 5, 7, 8}
+  x={1}
+  nx={1}
+  x={2}
+  nx={2}
+  x={}
+  nx={}
+  x={2, 3, 8}
+  nx={2, 8}
+  x={1, 4, 5, 7, 2, 8}
+  nx={1, 4, 5, 7, 2, 8}
+  x={2, 8}
+  nx={2, 8}
+new_extents={{1}, {2}, {}, {1, 4, 5, 7, 2, 8}, {2, 8}}
+self={{1, 2, 3, 4, 5, 6, 7, 8}, {1}, {2}, {}, {2, 3, 8}, {1, 4, 5, 7, 2, 8}, {2, 8}}
+
+gs={4, 5, 2, 3, 8}
+  x={1, 2, 3, 4, 5, 6, 7, 8}
+  nx={2, 3, 4, 5, 8}
+  x={1}
+  nx={}
+  x={2}
+  nx={2}
+  x={}
+  nx={}
+  x={2, 3, 8}
+  nx={2, 3, 8}
+  x={1, 4, 5, 7, 2, 8}
+  nx={4, 5, 2, 8}
+  x={2, 8}
+  nx={2, 8}
+new_extents={{2}, {}, {2, 3, 8}, {2, 8}, {4, 5, 2, 3, 8}, {4, 5, 2, 8}}
+self={{1, 2, 3, 4, 5, 6, 7, 8}, {1}, {2}, {}, {2, 3, 8}, {1, 4, 5, 7, 2, 8}, {2, 8}, {4, 5, 2, 3, 8}, {4, 5, 2, 8}}
+
+gs={1, 7, 2, 8}
+  x={1, 2, 3, 4, 5, 6, 7, 8}
+  nx={1, 2, 7, 8}
+  x={1}
+  nx={1}
+  x={2}
+  nx={2}
+  x={}
+  nx={}
+  x={2, 3, 8}
+  nx={2, 8}
+  x={1, 4, 5, 7, 2, 8}
+  nx={1, 7, 2, 8}
+  x={2, 8}
+  nx={2, 8}
+  x={4, 5, 2, 3, 8}
+  nx={2, 8}
+  x={4, 5, 2, 8}
+  nx={2, 8}
+new_extents={{1}, {2}, {}, {2, 8}, {1, 7, 2, 8}}
+self={{1, 2, 3, 4, 5, 6, 7, 8}, {1}, {2}, {}, {2, 3, 8}, {1, 4, 5, 7, 2, 8}, {2, 8}, {4, 5, 2, 3, 8}, {4, 5, 2, 8}, {1, 7, 2, 8}}
+
+gs={2, 3, 8}
+  x={1, 2, 3, 4, 5, 6, 7, 8}
+  nx={2, 3, 8}
+  x={1}
+  nx={}
+  x={2}
+  nx={2}
+  x={}
+  nx={}
+  x={2, 3, 8}
+  nx={2, 3, 8}
+  x={1, 4, 5, 7, 2, 8}
+  nx={2, 8}
+  x={2, 8}
+  nx={2, 8}
+  x={4, 5, 2, 3, 8}
+  nx={2, 3, 8}
+  x={4, 5, 2, 8}
+  nx={2, 8}
+  x={1, 7, 2, 8}
+  nx={2, 8}
+new_extents={{2}, {}, {2, 3, 8}, {2, 8}}
+self={{1, 2, 3, 4, 5, 6, 7, 8}, {1}, {2}, {}, {2, 3, 8}, {1, 4, 5, 7, 2, 8}, {2, 8}, {4, 5, 2, 3, 8}, {4, 5, 2, 8}, {1, 7, 2, 8}}
+
+New Concept: extent={1, 2, 3, 4, 5, 6, 7, 8}, intent={}
+New Concept: extent={1}, intent={1, 4, 5, 7}
+New Concept: extent={2}, intent={2, 3, 4, 5, 6, 7, 8}
+New Concept: extent={}, intent={1, 2, 3, 4, 5, 6, 7, 8}
+New Concept: extent={2, 3, 8}, intent={3, 6, 8}
+New Concept: extent={1, 4, 5, 7, 2, 8}, intent={4, 5}
+New Concept: extent={2, 8}, intent={3, 4, 5, 6, 7, 8}
+New Concept: extent={4, 5, 2, 3, 8}, intent={6}
+New Concept: extent={4, 5, 2, 8}, intent={4, 5, 6}
+New Concept: extent={1, 7, 2, 8}, intent={4, 5, 7}
+Time (up_down_sets): 0.024251 seconds
+Time (upper_covers): 0.010121 seconds
+Time (lower_covers): 0.003218 seconds
+Time (top_bottom): 0.004235 seconds
+Time (contingents): 0.011429 seconds
+reset_scale
+++ SYS COMMAND: /query_graph.exe /home/rcole/Sandpit/analyse_toscanaj_0_2.wiki/toscanaj "n1 has-unfolded \"net.sourceforge.toscanaj.DataDump\"."
+-- SYS COMMAND
+++ SYS COMMAND: /query_graph.exe /home/rcole/Sandpit/analyse_toscanaj_0_2.wiki/toscanaj "n1 has-unfolded \"net.sourceforge.toscanaj.observer\"."
+-- SYS COMMAND
+++ SYS COMMAND: /query_graph.exe /home/rcole/Sandpit/analyse_toscanaj_0_2.wiki/toscanaj "h1 has-unfolded \"net.sourceforge.toscanaj.canvas\"."
+-- SYS COMMAND
+++ SYS COMMAND: /query_graph.exe /home/rcole/Sandpit/analyse_toscanaj_0_2.wiki/toscanaj "h1 has-unfolded \"net.sourceforge.toscanaj.observer\"."
+-- SYS COMMAND
+++ SYS COMMAND: /query_graph.exe /home/rcole/Sandpit/analyse_toscanaj_0_2.wiki/toscanaj "n1 has-unfolded \"net.sourceforge.toscanaj.controller\"."
+-- SYS COMMAND
+++ SYS COMMAND: /query_graph.exe /home/rcole/Sandpit/analyse_toscanaj_0_2.wiki/toscanaj "n1 has-unfolded \"net.sourceforge.toscanaj.model\"."
+-- SYS COMMAND
+++ SYS COMMAND: /query_graph.exe /home/rcole/Sandpit/analyse_toscanaj_0_2.wiki/toscanaj "n1 has-unfolded \"net.sourceforge.toscanaj.parser\"."
+-- SYS COMMAND
+++ SYS COMMAND: /query_graph.exe /home/rcole/Sandpit/analyse_toscanaj_0_2.wiki/toscanaj "n1 has-unfolded \"net.sourceforge.toscanaj.canvas\"."
+-- SYS COMMAND
+++ SYS COMMAND: /query_graph.exe /home/rcole/Sandpit/analyse_toscanaj_0_2.wiki/toscanaj "n1 has-unfolded \"net.sourceforge.toscanaj.view\"."
+-- SYS COMMAND
+++ SYS COMMAND: /query_graph.exe /home/rcole/Sandpit/analyse_toscanaj_0_2.wiki/toscanaj "h1 has-unfolded \"net.sourceforge.toscanaj.controller\"."
+-- SYS COMMAND
+++ SYS COMMAND: /query_graph.exe /home/rcole/Sandpit/analyse_toscanaj_0_2.wiki/toscanaj "h1 has-unfolded \"net.sourceforge.toscanaj.model\"."
+-- SYS COMMAND
+++ SYS COMMAND: /query_graph.exe /home/rcole/Sandpit/analyse_toscanaj_0_2.wiki/toscanaj "h1 has-unfolded \"net.sourceforge.toscanaj.DataDump\"."
+-- SYS COMMAND
+++ SYS COMMAND: /query_graph.exe /home/rcole/Sandpit/analyse_toscanaj_0_2.wiki/toscanaj "h1 has-unfolded \"net.sourceforge.toscanaj.parser\"."
+-- SYS COMMAND
+++ SYS COMMAND: /query_graph.exe /home/rcole/Sandpit/analyse_toscanaj_0_2.wiki/toscanaj "h1 has-unfolded \"net.sourceforge.toscanaj.view\"."
+-- SYS COMMAND
+++ SYS COMMAND: /query_graph.exe /home/rcole/Sandpit/analyse_toscanaj_0_2.wiki/toscanaj "n1 has-unfolded \"net.sourceforge.toscanaj.MainPanel\"."
+-- SYS COMMAND
+++ SYS COMMAND: /query_graph.exe /home/rcole/Sandpit/analyse_toscanaj_0_2.wiki/toscanaj "h1 has-unfolded \"net.sourceforge.toscanaj.MainPanel\"."
+-- SYS COMMAND
+Left Button Press
+reset_scale
+Left Button Press
+reset_scale

@@ -1,0 +1,697 @@
++++ Collected Notes on Debian Packages
+
+For the latest jump down to "A Logical Approach".
+
+++++ Tags
+
+DebTags are facetted classification system for debian packages. 
+[1][http://debtags.alioth.debian.org/faceted.html]
+
+++++ Debian Package Browser
+
+The [Debian Package Browser][http://debian.vitavonni.de/packagebrowser/] 
+seems to be an effort to collect tagged classifications of packages
+using a web browser interface.
+
+The [EDOS project][http://protactinium.pps.jussieu.fr/xwiki/bin/view/Main/WP2CurrentAnalysis] has generated some graphs showing package dependencies in debian.
+
+++++ Lab Notes
+
+Since these are lab notes they record a number of false starts. Well
+suppositions that once explored were found to be incorrect. Thus to
+short circuit a lot of confusion is makes sence to jump down to the
+last paragraph in each section.
+
++++++ Files and Their Contents
+
+The following files contain information about packages.
+
+  - /var/lib/dpkg/available
+  - /var/lib/dpkg/status
+  - /var/lib/apt/lists/*Package
+
+It seesm that dselect makes a summary of installed files in available
+and status. Experiements on my system have led me to the following
+conclusions:
+
+  - some installed files are not listed in available
+
+  - there is only ever one version of each package in the union of
+    status and available
+
+  - status contains full records for some packages and very short
+    records for other packages
+
+  - some packages on my system appear to not have their prequesities met
+
+To substantiate my last point consider the following:
+
+---
+Missing dependency for libmagick6: libltdl3 (>= 1.5.2-2)
+  available version is: libltdl3 1.5.6-6
+    version is not in target installed install
+    version is in status all available
+---
+
+Checking that my program is working correctly here are the entries
+from status. Incidencly there is full entry for libmagick6 in both
+status and also in available.
+
+---
+Package: libmagick6
+...
+Depends: libbz2-1.0, libc6 (>= 2.3.2.ds1-21), libdps1 (>> 4.1.0), 
+ libfreetype6 (>= 2.1.5-1), libice6 | xlibs (>> 4.1.0), 
+ libjasper-1.701-1 (>= 1.701.0), libjpeg62, liblcms1 (>= 1.08-1), 
+ libltdl3 (>= 1.5.2-2), libpng12-0 (>= 1.2.8rel), libsm6 | xlibs (>> 4.1.0), 
+ libtiff4, libx11-6 | xlibs (>> 4.1.0), libxext6 | xlibs (>> 4.1.0), 
+ libxml2 (>= 2.6.19), libxt6 | xlibs (>> 4.1.0), zlib1g (>= 1:1.2.1)
+...
+Status: install ok installed
+
+Package: libltdl3
+Status: purge ok not-installed
+Priority: optional
+Section: libs
+---
+
+So there is library that libmagick6 is dependent on which is not
+installed. So how can this occur?
+
+This came about because multiple versions of some packages exist
+within the union of the descriptions in *available* and *status*. My
+program was updated to allow multiple package versions and when this
+was done it stopped complaining about unsupported packages.
+
++++++ Provides Field
+
+I should also mention that the program first accounts for the provides
+field before accounting for dependencies.
+
+---
+  def pr_closure(target)
+    pr_target = Set.new
+    for x in target
+      for p in x.provides do
+        pr_target.add(p)
+      end
+      pr_target.add(x)
+    end
+  end
+---
+
+Currently there are a large number of virtual packages which are being
+extracted. The present program architecture treats these as seperate
+packages. Since the empty version string comes before any other
+version string any version of package x will satisfy any dependency
+the virtual package x.
+
+The status file currently contains descriptions of packages without
+version information. It seems that, within the status file, every
+installed package contains a full description while uninstalled
+packages have minimal descriptions that don't contain a version.
+
+The formalisation of the provides field has changed. It was realised
+that provides in fact only makes mention of virtual packages and that
+virtual packages do not provide other packages. As a result the
+provides field can be accounted for the definition of packages
+matching a dependency and packages causes in conflict. This has been
+done.
+
+++++ Next Questions
+
+  - How to account for conflicts. There is currently no code for doing
+    this at present.
+
+  - When dependencies are not met, how to construct the concept lattice
+    that shows the different options.
+
+  - How to handle dependencies which are virtual packages.
+
+  - How to handle recursion in the depdendency satisfaction process. Seems to be a problem that requires copying sets
+
+    - Given a stack of dependecies the task is to pop items from the
+      dependency stack and satisfy them one by one.
+
+    - If there is more than one way to satisfy a dependency then this
+      causes a branch (seperate solution path)
+
+    - Backtracking causes all paths to be examined
+
+    - Each termination point gives a potential solution
+
+---
+    def step(depends, current_solution, solutions) 
+      while ! depends.empty do
+        x = depends.pop
+        if ! current_solution.includes(x) then
+          for y in solutions_to(x)
+            current_solution.push(y)
+            for z in y.depends do depends.push(z) end
+            step(depends.copy, current_solution, solutions)
+            current_solution.pop(y)
+          end
+          break
+        end
+      end
+      if depends.empty then
+        solutions.push(solution)
+      end
+    end
+---
+       
+This algorithm seems a bit wrong. The algorithm needs to handle the
+case that dependencies later on in the list may be solved by adding
+dependencies from earlier in the list. The algorithm might actually be
+clearer when formulated using sets and the matches function defined in
+the program I've been writing.
+
+---
+  def solve_ce(ce: CExpr, ps: Package Set, solutions: Package Set Array)
+    if not ce.is_empty then
+      de = ce.pop
+      for i in 1..de.size do
+        if ps.satisfies(de[i]) then
+          ps.checkpoint(ps, ce) { |ps, ce|
+            solve_ce(ce, ps, solutions)
+          }
+        else
+          for p in de[i].matching_packages do
+            if not conflicts(p, ps) then 
+              checkpoint(ps, ce) { |ps, ce|
+                ps.insert(p)
+                ce.append(p.depends)
+                solve_ce(ce, ps, solutions)
+              }
+            end
+          end
+        end
+      end
+    else
+      solutions.push(ps.dup)
+    end
+  end
+---
+
+This is a rewrite of the algorithm. It uses a function checkpoint that
+takes a block and restores, on completion of the block, ps and ce to
+the values they had before the block was executed. You would get that
+for free in a functional language, but the aggregation of solutions
+would potentially be ugly (unless you passed around a reference).
+
+The algorithm is interesting in the following ways: (i) it is
+basically doing the backtracking algorithm that can be used to write a
+prolog interpreter (but without having to do subsitution and that
+stuff). (ii) it is a recursive algorithm that has been written into
+the OO paradygm. 
+
+It might seem that the checkpoints can be removed by strategic
+removes. However one must be aware that remove is not exactly the
+reverse of insert. It misses the case of when p is already a member of
+ps.
+
+---
+    s = []
+
+    if not ps.is_member(p) then
+      ps.insert(p)
+      s.push(p)
+    end
+
+    ... # some stuff
+
+    s.each { |p| ps.remove(p) }
+    s = []
+---
+
+It is interesting that this functionality can be provided by a simple
+wrapper over set.
+
+---
+  class SetCheckPointProvidesInsert < 'a InsertEnumerable
+    include SetWrapperForInsertOnly
+
+    def initialize(ps: 'a Set)
+      @ps = ps
+      @insert_stack = []
+    end
+    def insert(x: 'a)
+      if not @ps.is_member(x) then
+        insert_stack.push(x)
+        @ps.insert(x)
+      end
+    end
+    def rollback
+      @insert_stack.each { |x| ps.remove(x) }
+    end
+  end
+---
+  
+Doing a wrapper that also supports remove is perhaps a little more
+tricky because two sets need to be maintained, a set of elements to
+remove and a set of element to insert. For completeness however such a
+wrapper should probably be extended to use this functionality.
+
+It is an interesting question in passing whether the wide range of set
+functions should be reduced to functions calling: insert, remove, and
+each. Doing such a thing makes writing wrappers easier but undoubtedly
+looses a lot in of functionality. Another possibility is to have a
+wrapper which can produce a full set interface from insert, remove and
+each but to implement basic sets as efficiently as possible. This
+means that deligation after override some methods doesn't work and
+instead the wrapper should include in its interface the transformer.
+
+In practice since we don't have a working version of RJL yet (just
+code fragements at the moment of the type seen above) the algorithms
+are going to have to be implemented in C++. Checkpoints will be
+removed from the solve_ce by doing the required house keeping within
+the function itself.
+
+
+++++ Matching Conflicts
+
+
+Packages commonly conflict with themseleves. This means that testing
+for a conflict is somewhat involved.
+
+---
+  Conlicts(p) \sqsubseteq Pr(P \setminus p)
+---
+
+This is somewhat difficult to achieve and it requires some argument that
+
+---
+  Pr(P \setminus p) = Pr(P) \setminus Pr(\{p\})
+---
+
+In fact this is not the case because a virtual package may be
+supported by multiple elements in P.
+
+The difficulty with the first expression is that it is complex to
+compute. It could be incrementally computed in the following way:
+
+---
+  Pr(P \setminus p) = Pr(P) \setminus 
+    \{ p in Provides(p) | 
+         \neg \exists q \in P: q \not= p \and p \in provides(q) 
+    \}
+---
+
+Since the inverse of the provides relationship is stored this is not
+very expensive to compute. Just a bit laborious.
+
+It should be noted that the program currently allows disjunctive
+expressions in the provides field for packages. But of course this
+isn't done in practice and its meaning would be very suspicious
+anyway.
+
+++++ Examples of Interaction
+
+The following example demonstrates that a particular package cannot be
+installed. apt-get has given up and reported an error.
+
+---
+  rcole@g318-8948:fca_debian$ sudo apt-get install kdevelop3
+  Password:
+  Reading package lists... Done
+  Building dependency tree... Done
+  Some packages could not be installed. This may mean that you have
+  requested an impossible situation or if you are using the unstable
+  distribution that some required packages have not yet been created
+  or been moved out of Incoming.
+  
+  Since you only requested a single operation it is extremely likely that
+  the package is simply not installable and a bug report against
+  that package should be filed.
+  The following information may help to resolve the situation:
+  
+  The following packages have unmet dependencies:
+    kdevelop3: Depends: kdelibs4 (>= 4:3.3.2-6) but it is not going to be 
+                        installed
+               Depends: kdebase-bin but it is not going to be installed
+               Depends: kdevelop3-plugins but it is not going to be installed
+  E: Broken packages
+---
+
+Dselect on the other hand marks a number of packages for retrieval but
+still has problems.
+
+++++ Some Generate Results (More Questions)
+
+The algorithm described above was implemented to search for
+solutions. The exact details can be seen in the file
+package_analyser.cpp:1.5 in the fca_debian directory.
+
+The algorithm doesn't work because it is not recording adequately
+solved and unsolved dependencies. The problem stems from there being
+two tasks: (i) solving the current disjunctive expression, and (ii)
+solving all the disjunctive expressions currently on the queue.
+
+Currently the variable result is recording only whether or not a full
+solution was found, not whether or not the current dependency could be
+solved. 
+
+The program at once needs to iterate through packages matching a
+disjunctive expression and at the same time aggregate the solutions
+for conjunctive expressions.
+
+---
+  def solve_ce(cs: DExpr Seq, ps: Package Set)
+    if ! cs.empty then
+      ds = cs.pop_front
+      for es in ds do
+        if ps.satifies(es) then
+          for p in matches(es) do
+            if ! ps.is_member(p) && ! ps.conflicts(p) then
+              ps.checkpoint {
+                ps.insert(p)
+                result = result || (solve_cs(p.requires, ps) && solve_cs(cs, ps))
+              }
+            end
+          end
+        end
+      end
+    end
+  end
+---
+
+
+
+
+
+
+++++ Random Ideas
+
+It may be of use to write a program that constructs a graph showing
+the debian package conflicts.
+
+++++ TODO
+
+   - *Update the formal description*: Matching an empty dependency is
+     different to matching an empty conflict statement. A conflict
+     must have at least one term in order to be matched, i.e. an empty
+     conflict statement shouldn't match.
+
+++++ A Logical Approach
+
+I realised that the problem can be formulated in propositional logic
+and then becomes the problem of finding a truth assignment function
+that makes a logical statement true. This is a well studied problem in
+computer science and there is an open source solver called miniSat
+that I'm going to look into using.
+
+The following code will output logical formula from a given
+target. First we calculate the packages required and then we dump the
+logical formulae.
+
+---
+  def search(cs: CExpr, ps: PackageSet)
+    while ! cs.empty do
+      x = cs.pop
+      for y in matches(x)
+        if ! ps.is_member(y) then
+          cs.append(y.depends)
+          ps.insert(y)
+        end
+      end
+    end
+  end
+
+  def dump(ps: PackageSet)
+    for p in ps do
+      ds = matches(p.depends)
+      if ! ds.empty then
+        puts "#{p} -> #{ds.to_a.map{|x|.to_s}.join(" + ")}"
+      end
+
+      for x in conflicts(p) do
+        puts "~#{p} + ~#{x}"
+      end
+    end
+  end
+---
+
+The output here is not in clausal form. Some simple rearrangement of
+implication is required to generate clausal form.
+
+---
+  a -> b + c === ~a + (b + c) === ~a + b + c
+---
+
+In fact as one can see it is very simple indeed as implications are
+already in a disjunctive form.
+
+The following is an example of CNF (Clause Normal Form) format.
+
+---
+  c This is a comment
+  c so is this
+  p cnf 4 3
+  1 2 
+  -2 -3
+  2 4
+---
+
+Lines may be comments (lines starting with a c), a header (lines
+starting with a p) or a disjunction of literals. A literal is either a
+variable or the negation of a variable. Literals are denoted by
+integers: the absolute value indicates the variable and the sign
+indicates whether or not it is negated. The header line indicates the
+format (cnf), the number of variables (4), and the number of clauses
+(3) in that order.
+
+SAT solvers attempt to find a truth assignment function (a mapping
+from the variables to true or false) that makes the logical formula
+true. In general the problem has been shown to be NP-hard, but in a
+wide variety of practical cases the solvers are tractable.
+
+However using a solver on the clauses produced for kdelibs4 prodcued
+the following: "Trival Problem. Unsatisfiable". Our purpose is to
+provide an explaination to the user for why the problem is
+unstaisfiable.
+
+Berhard Ganter has already explored the links between clauses and
+FCA. So this is where we turn now for inspiration. 
+
+I asked myself "what sort of answer do you want from the system" and
+in turn "what is the question", the question is "why can't i install
+this package" and the answer is because "these requirements are in
+conflict".
+
+Take for example the wff for kdelibs this is a conjunction of
+wffs. Some sets of these wffs are in conflict. Let the wff for kdelibs
+be $ABC$ (using boolean algebra here) then it may be the case that $A
+and B$ conflict, in that case any set of requirements including $A$
+and $B$ will conflict, i.e order filters of the powerset
+conflict. That is potentially important because it is linked to the
+theory of distributive lattices. Alternatively consider that only
+$ABC$ conflicts, not subsets of it (e.g. $AB$). This is possible
+because each of $A$, $B$, and $C$ are disjunctive expressions that may
+interfer with each other so to speak.
+
+So the answer for "install kdelibs" could be "kdelibs depends on
+xlibs-base which is uninstallable.", or "kdelibs has conflicting
+dependencies: 'xlibs-base | xlibs-tools' conflicts with 'gilium'".
+
+A term such as 'xlibs-base | xlibs-tools' can be unfolded to insert
+'xlibs-base' and 'xlibs-tools'. Each of these would conflict with
+'gilium' in the above example.
+
+The following algorithm computes minimal sets of conflicting packages.
+
+---
+  def search(A: Int Set, M: Int Set, context: Context, next_object: Int Ref)
+    for m in M - A do  # - means set minus [1]
+      if conflicts(A + {m}) then # + is union, -
+        context.insert_object_intent(next_object.value, A + {m})
+        next_object.value += 1 # note RJL is pass by ref [2]
+      else
+        search(A + {m}, M, context)
+      end
+    end
+  end
+---
+
+  - [1] In relation to RJL it makes sence to overload operators for
+    different object types. Also since this is returning a temporary
+    it makes sense perhaps to have it return a lazily evaluated
+    set. Alternatively with a bitset implemenation of sets one would
+    compute it upfront. Abstracting over this distraction is perhaps the
+    advantage (and disadvantage) of OO.
+
+  - [2] RJL is pass by ref but Int's are references to constant objects
+    and the method += modifies the reference to which next_object points
+    The following code shows how a reference is defined.
+
+    ---
+      class 'a Ref
+        def value: 'a = nil
+        deligate to value
+        deligate to ObjectInstance
+      end
+    ---
+    
+  - [2 cont] The default constructor for Ref will assign to the values
+    in the order they are declared or set them to their initial
+    values. The deligate field says that the object should deligate
+    unmatched method calls to its child. Making deligation work is a
+    bit delicate because there is a difference between instanceOf and
+    subClassOf. But this is too much of an aside for now and is a
+    distraction.
+
+The call to conflicts is a call to a SAT solver with "A + {m}" as a
+target.
+
+++++ Finding the bound between SAT and UNSAT
+
+---
+  s_plus: PowerSet  = [ {} ]
+  s_minus: PowerSet = [ D ]
+  e_plus: PowerSet  = []
+  e_minus: PowerSet = []
+
+  s_plus_finished = false
+  s_minus_finished = false
+
+  while ! s_plus_finished || ! s_minus_finished do
+    if (x = choose(s_plus, e_plus)) != nil then
+      for d in D.minus(x) do
+        xd = x.dup.insert(d)
+        if sat(xd) then
+          s_plus.insert(xd)
+        else
+          s_minus.insert(xd)
+        end
+      end
+      e_plus.insert(x)
+    else
+      s_plus_finished = true
+    end
+  
+    if (x = choose(s_minus, e_minus)) != nil then
+      for d in x do
+        xd = x.dup.remove(d)
+        if sat(xd) then
+          s_plus.insert(xd)
+        else
+          s_minus.insert(xd)
+        end
+      end
+      e_minus.insert(x)
+    else
+      s_minus_finished = true
+    end
+  end
+  
+---
+
+The test for SAT can make use of s_plus and s_minus to make its decisions.
+
+---
+  def sat(x)
+    if s_plus.contains_superset_of(x) then
+      return true
+    elsif s_minus.contains_subset_of(x) then
+      return false
+    else
+      return solver.is_sat(x)
+    end
+  end
+---
+
+It may be that S_plus and S_minus become very large. 
+
+++++ SAT Solvers
+
+The values in a clause are tri-state, +1, 0, or -1.
+
+---
+class Clause
+  pos: BitSet # which vars are positive
+  neg: BitSet # which vars are negative
+end
+
+class Solver
+  pos: BitSet # vars which are positive
+  neg: BitSet # vars which are neg
+
+  clauses: ClauseVector
+
+  def addClause(c: Clause)
+    # return false if conflict
+    # test for tautology
+    if ! (c.pos & c.neg).empty then
+      return true # tautology
+    end
+    clauses.push(c)
+    updateClause(c)
+  end
+
+  def updateClause(c)
+    # do any vars make the clause true
+    if (c.pos & pos) | (c.neg & neg) then
+      return true # tautology with current vars
+    end
+    # remove conflicts (they cannot be true)
+    rem_pos = c.pos & ~(c.pos & neg)
+    rem_neg = c.neg & ~(c.neg & pos)
+    # look for unitary clause
+    if rem_pos.count + rem_neg.count == 0 then
+      return false # contradiction
+    end
+    if rem_pos.count + rem_neg.count == 1 then
+      if rem_pos.count == 1 then
+        pos.set(rem_pos.first)
+        return updateVar()
+      else
+        neg.set(rem_neg.first)
+        return updateVar()
+      end
+    end
+  end
+
+  def updateVar(var)
+    for c in clauses do  # can be improved by a inverted-list
+      if ! updateClause(c) then
+        return false
+      end
+    end
+    return true
+  end
+
+  def search()
+    curr_pos = pos
+    curr_neg = neg
+    x = (curr_pos | curr_neg).first_in_complement
+    if x then
+      pos.set(x)  
+      if updateClauses(x) == false || search == false then
+        pos = curr_pos
+        neg = curr_neg
+        neg.set(x)
+        return ! (updateClauses(x) == false || search == false)
+      else
+        return true
+      end
+    else
+      return true
+    end
+  end
+end
+
+    
+      
+
+      
+      
+    
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,11 @@
++++ PIG - Personal Information Graphs
+
+The PIG project aimed to construct a triple store. It is implemented
+in a mixture of C and Ocaml. The current version of PIG has problems
+when triples are removed form the store and therefore is not
+recommended.
+
+Instead the open source project [Kowari][http://kowari.org] is
+recommended in its place.
+
+

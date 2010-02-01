@@ -1,0 +1,8 @@
+select $a $b
+from <rmi://localhost/server1#toscanaj>
+where
+  $a <gr:calls-in> $b and
+  $a <gr:in-rt> <gr:org.kowari.store.stringpool.memory.MemoryStringPoolImpl> and
+  $b <gr:in-rt> <gr:gnu.trove> and
+  $b <gr:is-a> <gr:method>
+;

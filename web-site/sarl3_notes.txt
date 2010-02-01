@@ -1,0 +1,251 @@
++++ Todo List (Not even started yet)
+
+1. Add Numeric Lists to the Wiki Language
+
+   - Not having numbered lists is a bit of pain, hence this new item at 
+     the top of the list.
+
+2. Expand the possibilities for configuring the look of concpets. Currently
+   concepts are not colored.
+
+4. Add support for drawing the DC(L).
+   - requires having support for realised and non realised concepts
+
+5. Add support for nested line diagrams.
+
+   - at present it is hard to see how to incorporate the current code other
+     then to expand the drawing and the data:
+
+     - inner lattice
+     - outer lattice
+     - lattice product
+     - data lattice
+     - map: data lattice -> lattice product
+
+---
+     for c, d in outer.upper_covers
+       draw_outer_edge(c,d)
+     end
+
+     for c in outer do
+       draw_outer_concept(c)
+     end
+     
+     for c in product do
+       draw_inner_concept(c)
+     end
+---
+
+   - the function depends on having an expression in sarl of a lattice
+     product.
+
+6. Another aspect is support for drawing concept lattices of clarified
+   contexts. The DC closure places more demands than the clarified context
+   computation.
+
+   - is this really a job for the client program?
+
+   - it is desirable to change the contents of the labels attached to
+     concepts For example sometimes the size of the contingent is
+     required, perhaps the field to be displayed is calculated
+     externally.
+
+   - the current structure is that labels are derived from the
+     contingent relations and the string tables
+
+   - the contingent relations are not used for layout (I think they
+     are not used for layout, layout is dependent currently on the
+     meet irreducibles).
+
+   - perhaps the node information should be accessible from outside
+     the view so for example:
+
+---
+     def label_to_object_contingent_count(label)
+       @view.set_concept_object_label(contingent_size(label.concept))
+     end
+---
+
+   - the labels have arrays of Pango layouts. The idea being that if
+     this information is cached then rendering of the concept lattice
+     is fast.
+
+   - currently there is little support for callbacks because this has
+     the potential to significantly reduce the rendering time. Rather
+     the view attempts to have enough paramters that a wide variety of
+     applications is possible.
+
+   - perhapse a concept interpreter is required. The view could have a
+     number of concept interpreters, each with its own label set. In
+     this way the client application could load a number of concept
+     interpretations.
+
+     - what about incremental loading of concept interpretations, should
+       there be a callback mechanism that allows the client program to
+       look up labels when they are asked for:
+
+       - this type of thing is usefull perhaps when the backend is a database
+         and the user goes from a count to a list of objects.
+
+     - so what would a concept interpreter look like?
+
+---
+    class ConceptInterpreterPair
+      objectInterp: ConceptInterp
+      attributeIntrep: ConceptInterp
+    end
+
+    class ConceptInterpreter
+      names: StringTable
+      contingents: PowerMap # concepts -> string table entries
+    end
+---
+
+     - the view then needs to keep a set of labels for each
+       concept interpreter
+
+     - it should also have a function which causes the labels to be updated
+       from the interp (so the interp can be updated)
+
+---
+    class LabelInterp
+      labels: Label Array
+    end
+
+    class LatticeView
+      label_interps: LabelInterp Array
+    end
+---
+
+     - the first step in refactoring to acieve this change is to put
+       in place a default interpreter.
+
+     - it is desirable to be able to mix labels from different interprerts
+       in the same diagram
+
+       - for this to work we need to store a (concept -> interp) mapping
+       - this mapping can be iterated over to find the right label.
+
+     - another possibility is to store the active labels in a hash table --- 
+       removing labels when they are hidden and 
+              
+
+3. Complements: Showing the complement of a lattice
+
+3. Printing
+
+   - what facilities does Gnome provide for printing? Can the diagrams
+     be exported to png, pdf, and eps?
+
+4. Support for DS Format
+
+   - how important is this? It is relatively straight forward although
+     some of the structures don't have exact counterparts in the DS format.
+
+5. Many value contexts and scales
+
+6. A file format for diagram
+
+   - should include saving positions of labels
+
+   - there isn't currently provision for that in the DS format
+
+   - the DS format for diagrams probably needs to be updated to be
+     more inline with the internal structures
+
+7. Additional manipulators
+
+   - presently there is only a manipulator for meet irreducibles. This should
+     probably be modified to allow manipulation of any element by
+     spreading the move to vectors in the down closure and the upclosure of
+     the concept.
+
+   - there also needs to be a manipulator that allows nodes to be manipulated.
+
+   - a manipulator that keeps rank assignment.
+
+     - maybe one could have concepts snap between ranks, but that is always
+       quite hard to provide adequate feedback for
+
+8. Some function to restore additivity
+
+   - options include:
+
+     - least mean squares
+
+     - simply remove the node offsets
+
+9. The ability to have labels display counts.
+
+   - extent or contingent should be diagram wide
+   - extent/contingent or list should be per concept
+
+10. Smooth transitions between diagrams
+
+   - a layout algorithm that is able to accomodate a modification to
+     the diagram would be good
+
+   - some facility to transition from the old diagram to the new via
+     an animation
+
+11. Storage of previous navigation points include the diagram
+
+   - This is very important for being able to back out of a diagram
+     elaboration that is too complex
+
+12. Storage of trajectories through the navigation space
+
+  - Also storage of particular points is usefull
+
+13. File format
+
+  - currently diagrams are based on meet irreducibles, so storing the diagram 
+    requires also storing the lattice.
+
+  - some sort of hierarchical format that supports references at least
+    locally is usefull.
+
+    - tones of small files is a bad news, really some sort of BTree is
+      required.
+
+    - that could support nodes having uid's and being retrievable. A
+      notion of containment would also allow quick recovery of the
+      children (maybe a lot of seeking but this is perhaps not so bad
+      if it is pushed down into the database layer).  What about 
+      [dbXML][http://www.dbxml.com/]?
+    
+
++++ Todo List (Half finished stuff)
+
+1. Website
+
+   - What should it contain, look like. 
+
+   - What should be the underlying technology. Some sort of navigation
+     structure plus simple Wiki language would seem appropriate.
+
+   - This is the website. It has been constructed and is now being edited.
+
+2. Scrollbars on Label
+
+   - relatively straight foward. Labels are characterised by a
+     height, in number of lines, an first line (number of lines again)
+     and a width in pixels. Cropping is used to limit the width. Labels
+     start of with a height of 4 (or less if they have fewer lines)
+     and an uncropped width. Under the scrollbar is a drag button than
+     can be used to make the label bigger. Is there something in gdk
+     for this? Can scrollbar be drawn using gdk?
+
+   - see [Sarl3ScrollingLabels][sarl3_scrolling_labels.html]
+
+   - thhere is no scrollwidget, just an up and down arrow presently
+     the provision of a scroll widget should be relatively straightforward
+
+2. This Todo List
+
+   - requires constant updating
+
+3. Diagram Metrics 
+
+   - presently only half the metrics have been implemented and non of
+     them have been tested.

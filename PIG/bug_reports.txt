@@ -1,0 +1,17 @@
+report:
+  title: Error in remove
+  location: void TreeNode::remove(mmap_file *mp, Tuple const& x)
+  descr:
+    The remove function doesn't take into account what happens when
+    the payload becomes empty. Nor does it handle the situation when
+    a node overflows as the result of a removal as might happen when a 
+    hole is created.
+  fixed:
+    This bug has been fixed. The remove test has been updated.
+
+report:
+  title: Error in remove (2)
+  location: Unknown
+  descr:
+    The test_tree_remove.cpp shows this error when the level check stuff
+    is added.

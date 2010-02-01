@@ -1,0 +1,19 @@
+person:"Richard Cole" has phone-number:"+61 (0) 7 325-77-025".
+
+"+61 (07) 325-77-025" has phone-number:local-number:"325-77-025".
+
+person:"Richard Cole" occupies room:_x has room-number:"1.25".
+
+person:"Richard Cole" has phone-book:_a contains 
+  entry:_b name person:"Bernd Groh", 
+  _b phone-number:work-phone-number "+61 (0) 7 5552-8923",
+  _a contains entry:_c name person:"Peter Eklund",
+  _c work-phone-number "+61 (0) 7 5552-8184",
+  _a contains entry:_c name "Peter Eklund",
+  _c phone-number:home-phone-number "+61 (0) 7 5526-3839".
+"Richard Cole" has:has-via-work Computer:_a has processor:"Pentium i386",
+_a name "Tempus".
+
+QUERY
+
+person:_x has _y.

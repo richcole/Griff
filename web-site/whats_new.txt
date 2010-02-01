@@ -1,0 +1,14 @@
++++ What's New
+
+This page is intended to contain a list of things that have been newly
+added to the website. Hopefully it will become automatic. But for now
+it is manually edited.
+
+  - [RJL Latest][rjl_latest.html]: A log of recent thinking about RJL.
+  - [Using Rails to Explore Data][rails_for_exploring_data.html]: Some notes on fairly slow progress in this regard. Shows some false starts and solutions.
+  - [Troken][troken.html]: Drunken notes on a tagging file system
+  - [MouseHole Tagger][mouse_hole_tagger.html]: How to use mousehole to track and automatically tag found pages on del.icio.us
+  - [Interesting Software][interesting_software.html]
+  - [Some Selected Correspondence between RJ and ALB][rj_alb_correspondence.html]
+  - [Learnings][learnings.html]
+  - [Sarl3 Screenshots][sarl_screenshots.html]

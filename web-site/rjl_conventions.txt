@@ -1,0 +1,48 @@
++++ RJL Classes and Interfaces
+
+Why do we want interfaces in programming languages? An interface can
+be a usefull place to document a contract. From an FCA perspective
+interfaces occur whenever two classes share a protocol. However one
+doesn't want to document each of these because there are way to many.
+
+Lets consider a simple interface, IEnum.
+
+---
+  interface 'a Enumerable
+    // this method takes an implicit block as an argument
+    def each() [implicit_block]
+    end
+  end
+
+  interface 'a Indexable
+    # retrieve the i'th element
+    def [](a: Int): 'a
+    end
+    def []=(a: Int, value: 'a)
+  end
+
+  module 'a Enumerator
+    extends: 'a Enumerable
+
+    def first
+      // note the use of a non local return
+      each { x | return x }
+    end
+  end
+---
+
+Defined are two interfaces. Immediately one wonders whether the
+implicit_block should be typed, and how it is that blocks are
+typed. See the section on block typing for a discussion.
+
+A module is a mixin that can be used to extend the functionality of
+class. What is the distinction between :extends, and :includes. With
+extends the child class overrides the parent class, with includes the
+included module overrides the child class.
+
++++ RJL Block Typing
+
+
+
+
+

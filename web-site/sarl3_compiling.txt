@@ -1,0 +1,32 @@
++++ Compiling Sarl3
+
+The source package sarl3-0.9.tar.gz can be downloaded from the
+sourceforge file release system
+[http://sourceforge.net/project/showfiles.php?group_id=20790][http://sourceforge.net/project/showfiles.php?group_id=20790].
+
+To install you need the following debian packages installed.
+
+---
+ sudo apt-get install tcl8.4 ruby1.8-dev tclsh g++ gtk2.0-dev gc-dev
+---
+
+
+The process is then:
+
+---
+tar -xzf sarl3-0.9.tar.gz
+cd sarl3-0.9.tar.gz
+make
+make install
+---
+
+If this doesn't work the first port of call is build_config.txt which
+contains some variables which can be set. The build_config.txt also
+contains the location where the files are installed. The default
+setting is to install in /usr/local.
+
+If you have any problems compiling please drop me an email and I will
+try to assist {rj-cole (at) sf.net}. It will also help me improve the
+build process.
+
+

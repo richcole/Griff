@@ -1,0 +1,9 @@
++++ Interesting Software
+
+  - [Xrefactory][http://xref-tech.com/xrefactory/emacs.html] This project 
+    worked quite well being grafted onto Sarl3 which has a moderately 
+    complex makefile.
+
+    The best aspect is that is provides method name completion as well
+    and extract function. A must for any serious refactoring activity.
+

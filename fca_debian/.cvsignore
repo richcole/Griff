@@ -1,0 +1,4 @@
+package_analyser
+package_analyser_test
+*.deps
+*.o

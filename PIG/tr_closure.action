@@ -1,0 +1,7 @@
+for "_r has-tr-closure _rt" do
+  for "_a _r _b" do
+    for "_c _rt _a, _b _rt _d" do
+      assert "_c _rt _b"
+    done
+  done
+done

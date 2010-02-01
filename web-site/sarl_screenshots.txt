@@ -1,0 +1,35 @@
++++ Sarl3 Screenshots
+
+The following is an example of a lattice constructed from a very small
+sample of movies.
+
+<<shot4.png>>
+
+The screenshots shows the use of scrolling abels in action. Note the
+"... 2 after" on the top right hand label.
+
+The lattice is kind of interesting because
+
+   - it is hard to get a good layout for
+   - it is generated from a very small data set and so has funny implications
+   - it is an example drawn from RDF like data
+
+To take up the last point. Consider that we have a triple store. Now
+consider that we generate a context in the following way:
+
+---
+  foreach "_movie is-a movie"
+    foreach "_movie has-title _title"
+      foreach "_movie _a _b, _a in {director, genre, actor}"
+        context.insert("title: _title", "_a: _b")
+      end
+    end
+  end
+---
+
+Then the lattice shows actors, directors, and genres for movies
+identified by their title. Using titles to identify movies is
+problematic since several movies might have the same name, so some
+other identifier that perhaps include the date of release would be
+potentially better. It doesn't effect this example though.
+

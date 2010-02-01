@@ -1,0 +1,9 @@
++ Garbage Collection
+
+There are some parts of the code that expect that garbage collection
+is going to take place. i.e. the current code leaks.
+
+Places where this has been recognised are marked by a
+sarl_potential_code_leak statement.
+
+

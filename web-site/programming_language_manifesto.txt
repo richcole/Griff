@@ -1,0 +1,93 @@
++++ Programming Language Manifesto
+
+This manifesto contains some thoughts on the ultimate programming language.
+
+  - *static typing is too pedantic* Static typing often gets in the
+    way and requires the programmer to be pedantic. Language like
+    Java create tons of busy work in which the programmer has to
+    specify types again and again.
+
+  - *dynamic typing looses too much information* Having no static
+    types is bad because users of library don't know the types
+    returned by methods in the interface and neither does the
+    compiler thus making automated optimisation problematic.
+
+The conclusion is that we need a language that allows static types but
+isn't pedantic about them. The way to do this is to have a type
+*Unknown*. If a variable has the type *Unknown* then any method can be
+called on it. The default type for variables in *Unknown*. If a
+variable has any other type then only methods defined legal for that
+type can be called.
+
+Lets have a look at how this works in a small example.
+
+---
+  interface 'a 'b Iterable 
+    def each(block: 'a -> 'b): Unit
+  end
+
+  interface IntIterable 
+    refines Int Unit Iterable
+  end
+
+  interface IContext 
+    def insert(g: Int, m: Int): Unit
+  end
+
+  interface ILattice
+    refines IntIterable
+    def meet_irr: IBitSet
+    def join_irr: IBitSet
+  end
+
+  interface IBitSet
+    refines IntIterable
+  end
+
+  class Lattice
+    def reduced_context(lattice: ILattice): IContext
+      context = Context.new
+      for m in lattice.meet_irr do
+        for g in lattice.downset[m] & lattice.join_irr do
+          context.insert(g, m)
+        end
+      end
+      return context
+    end
+  end
+---
+
+There is quite a lot of type inference required to make this
+work. Even if the type systems fails to adequately check the program
+the type information is still useful in IDE's for method name
+completion. 
+
+In some sense the interfaces are a product of the program and the
+classes. Although there is some human involvement required to decide
+exactly the best structure. With adequate type information one can
+attempt to synthesis interfaces.
+
+
++++ Multiple Concerns
+
+
+We must be carefull that we don't mix perspectives, or allow on
+prespective to leak into another.
+
+There are several perspectives from which to view a software component
+that correspond to different roles. A developer of an ADT package may
+like to see the way in which the implementations of the different
+packages are expressed. He or she may also be interested in some
+theory by which some operations are reduced into a base set of
+operations. This perspective on a library is quite different to a
+casual user of the library who wants to have a consistent interface to
+a collection of objects. Any hierarchy is only of concern in so far as
+it groups the classes based on their interfaces.
+
+An interface however can also be seen to express a contract. At one
+level this is problematic since a complex contract is harder to
+understand than a simple or no contract. In OO systems as provided by
+Smalltalk like languages one classes often do not try to enforce a
+contract but rather provide rather open access, a contract and a
+responsibility on behalf of the user of the library to follow the
+contract in order to get the desired behaviour.

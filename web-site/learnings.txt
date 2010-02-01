@@ -1,0 +1,14 @@
++++ Learnings
+
+This section contains a sequence of short descriptions of things that
+have been picked up here and there.
+
+The title is taken from "Vernin God Little" who collected through his
+adventure various learnings.
+
+  - [Hard and Easy Problems][hard_and_easy_problems.html]
+  - [What is XML for][what_is_xml_for.html]
+
+
+
+

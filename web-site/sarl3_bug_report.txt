@@ -1,0 +1,27 @@
++++ Sarl3 Bug Report
+
+++++ Lattice not respecting object implication
+
+<<shot5.png>>
+
+The object java should be attached to the bottom node. So is this
+error present in the formal context?
+
+Hang on this isn't a bug. Java doesn't imply javax or org. The diagram
+is ok.
+
+But what in Java is dependent on JComponent?
+
+Here is an elaboration of the diagram.
+
+<<shot6.png>>
+
+It seems that awt.component makes a call to
+swing.JComponent. Interesting. If it weren't for this dependency then
+AWT would not (for static calls at least) be dependent on Swing.
+
+Oh and there was bug in the object contingent computation of the
+bottom concept (caused by not handling the case of no lower
+covers). It has been fixed now.
+
+

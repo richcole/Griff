@@ -1,0 +1,42 @@
++++ Learning: Hard and Easy Problems
+
+Often an NP-hard problem has a NP-hard solution and a trivial
+solution. And sometimes the trival solution is not very much worse
+than the NP-hard solution. Lets see an example.
+
+Consider a job allocator that must allocate jobs to workers. Let each
+worker have a description $(r_1,...,r_n)$ listing the amount of each
+resource that it has. Jobs also have a resource description
+$(r_1,...,r_n)$ that indicates how much of each resource they consume
+while active. How the allocator must allocate jobs to workers so that
+no worker is overloaded. How should this be done, and for a given set
+of resources, how many workers are needed?
+
+Well there is a hard optimal solution and a trivial non optimal
+solution to this problem. In the trivial solution:
+
+  - Allocate the jobs one by one to a worker that has room for them
+
+  - Have enough workers such that this allocation will always succeed.
+
+To workout how many workers are needed let us consider the fail
+condition, that is the point at which each worker does not have room
+for the next job.
+
+To detect the fail condition, take out $j_i$ from the jobs, now the
+space allocated is $sum_{k,k!=i}$ r(j_k)$ and the space remaining in
+each worker must be less than $j_i$, so an upper bound for the space
+remaining is $n r(j_k)$ where $n$ is the number of workers. The total
+space provided by the workers is $sum_{k} r(w_k)$ which for the fail
+condition to be satisfied must be less than allocated space plus the
+upper bound on the remaining space. Needless to say we need to satisfy
+this equation for all $j_i$.
+
+So we have a mechanism to either (i) for a set of workers figure out
+whether or not they fit in a given number of workers using trival
+scheduling, or (ii) for a set of jobs figure out how many workers are
+required such that we never run out workers.
+
+On a final note, sometimes a trivial solution is not satisfactory. For
+example in diagram layout it is seldom the case that a trivial
+placement of diagram nodes is satisfactory.

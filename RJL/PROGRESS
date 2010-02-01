@@ -1,0 +1,22 @@
+Scanner:
+
+  The scanner is a single file include a test program. It needs to be
+  broken down to make it accessible from a parser. The current plan is
+  to make a recursive decent parser. Maybe cause I just started this
+  out without having Bison around, and maybe cause in some sense I
+  want to keep it simple.
+
+  There will however still be a parse tree constructed. From the parse
+  tree it is anticipated that code will generate LLVM code from the
+  parse tree. This is yet to be tested.
+
+  TODO:
+    - Add more symbols to the scanner
+    - Change the description of the griff project to include FCA and also RJL.
+    - Add links to the RJL syntax etc pages on the main RJL page and 
+      promote RJL to a project.
+    - Add a facility to track the line number and file number of the current line in
+      tokens.
+
+  DONE:
+    - Break out the scanner into an interface and implementation file

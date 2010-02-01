@@ -1,0 +1,72 @@
+generate.pl.in
+  - duplicate the section that iterates over the Qt directory
+
+kalyptusCxxToSmoke.pl
+  - add an entry to sarl_unsigned_int and sarl_signed_int
+  - at this stage ignored sarl_string_ptr
+
+Initial success --- building appropriate x_*.cpp files
+
+smoke/qt/Makefile
+  - having trouble figuring out where this one is configured from
+    so I'm editing it to try to get compilation working first
+
+  - editing the Makefile didn't seem to have any effect on the compilation
+    process so instead I ran the commands:
+
+    ---
+      pushd smoke/qt
+      generate.pl
+      if [ ! -d objs ] ; then mkdir objs; fi
+      for x in *.cpp ; do 
+        echo g++ -c -fPIC -I. -I.. -I/usr/include/qt3 \
+          -I/usr/local/include/sarl \
+          $x -o objs/`echo $x | sed -e 's/.cpp$/.o/'`
+        g++ -c -fPIC -I. -I.. -I/usr/include/qt3 \
+          -I/usr/local/include/sarl \
+          $x -o objs/`echo $x | sed -e 's/.cpp$/.o/'`
+      done
+      g++ objs/*.o -shared -o libsmokeqt.so -lsarl -lqt-mt
+    ---
+
+  - this seems to have worked ok, now to test it out
+
+    ---
+      install libsmokeqt.so /usr/local/lib/libsmokesarl.so.0.1.0
+      ln -s libsmokesarl.so.0.1.0 /usr/local/lib/libsmokesarl.so.0.1
+      ln -s libsmokesarl.so.0.1.0 /usr/local/lib/libsmokesarl.so.0
+      ln -s libsmokesarl.so.0.1.0 /usr/local/lib/libsmokesarl.so
+      popd
+    ---
+
+  - now try to rebuild the qtruby lib:
+
+    - since we are going to change the name of the library we need to
+      change the name of the init function
+        Init_qtruby -> Init_qtrubysarl 
+    - there is also some magic regarding names that needs to be updates.
+      The following functions were updated to include entries looking
+      for classes starting with either Sarl or KDE::Sarl
+        - kde_package_to_class
+        - create_qt_class
+        - create_qobject_class
+
+    ---
+      pushd qtruby/rubylib/qtruby
+      gcc -fPIC -shared -o libqtruby.so *.cpp \
+        -L/usr/local/lib -I../../../smoke/ \
+        -I/usr/include/qt3 -I/usr/local/include/sarl3 \
+        -I/usr/lib/ruby/1.8/i486-linux/ \
+        -lsmokesarl -lqt-mt -lsarl
+      popd
+    ---
+
+  - now try to install it
+
+    ---
+      install libqtruby.so /usr/local/lib/libqtrubysarl.so.0.1.0
+      ln -s libqtrubysarl.so.0.1.0 /usr/local/lib/libqtrubysarl.so.0.1
+      ln -s libqtrubysarl.so.0.1.0 /usr/local/lib/libqtrubysarl.so.0
+      ln -s libqtrubysarl.so.0.1.0 /usr/local/lib/libqtrubysarl.so
+      popd
+    ---

@@ -1,0 +1,33 @@
+#  + Dynamic Typing and Type Inference
+#
+#  The type of the array class is an interesting case because in a dynamic
+#  language it may not be possible to restrict the type of the array. Consider
+#  the following example:
+#
+#  ---
+#    1. a = Array.new
+#    2. a.push('1')
+#    3. a.push(1)
+#  ---
+#
+#  Type inference works in the following way:
+#    1. Array becomes an Unknown Array
+#    2. 'a' becomes a String Array
+#    3. 'a' becomes an Any Array
+#
+#  The type algebra has the following rules:
+#
+#  ---
+#    Unknown & x -> x
+#    String ^ Int -> Any
+#    Any & x -> Any
+#  ---
+#
+#  In this way Unknown is the top of the type hierarchy and Any is the bottom
+#  of the type hierarchy.
+#
+#  For example one may, due to the closed world assumption has that:
+#  ---
+#    Enumerable & Sorted -> Tree
+#  ---
+

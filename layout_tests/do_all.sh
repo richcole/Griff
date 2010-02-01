@@ -1,0 +1,3 @@
+bash generate_diagrams.sh
+bash generate_stats.sh
+bash generate_rank_contexts.sh

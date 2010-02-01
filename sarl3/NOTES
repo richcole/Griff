@@ -1,0 +1,102 @@
+
++++ Todo List (Not even started yet)
+
+1. Website
+
+   - What should it contain, look like. 
+
+   - What should be the underlying technology. Some sort of navigation
+     structure plus simple Wiki language would seem appropriate.
+
+2. Scrollbars on Label
+
+   - relatively straight foward. Labels are characterised by a
+     height, in number of lines, an first line (number of lines again)
+     and a width in pixels. Cropping is used to limit the width. Labels
+     start of with a height of 4 (or less if they have fewer lines)
+     and an uncropped width. Under the scrollbar is a drag button than
+     can be used to make the label bigger. Is there something in gdk
+     for this? Can scrollbar be drawn using gdk?
+
+3. Printing
+
+   - what facilities does Gnome provide for printing? Can the diagrams
+     be exported to png, pdf, and eps?
+
+4. Support for DS Format
+
+   - how important is this? It is relatively straight forward although
+     some of the structures don't have exact counterparts in the DS format.
+
+5. Many value contexts and scales
+
+6. A file format for diagram
+
+   - should include saving positions of labels
+   - there isn't currently provision for that in the DS format
+   - the DS format for diagrams probably needs to be updated to be more inline with the internal structures
+
+7. Additional manipulators
+
+   - presently there is only a manipulator for meet irreducibles. This should
+     probably be modified to allow manipulation of any element by
+     spreading the move to vectors in the down closure and the upclosure of
+     the concept.
+
+   - there also needs to be a manipulator that allows nodes to be manipulated.
+
+   - a manipulator that keeps rank assignment.
+     - maybe one could have concepts snap between ranks, but that is always
+       quite hard to provide adequate feedback for
+
+8. Some function to restore additivity
+
+   - options include:
+     - least mean squares
+     - simply remove the node offsets
+
+9. The ability to have labels display counts.
+
+   - extent or contingent should be diagram wide
+   - extent/contingent or list should be per concept
+
+10. Smooth transitions between diagrams
+
+   - a layout algorithm that is able to accomodate a modification to the diagram would be good
+
+   - some facility to transition from the old diagram to the new via an animation
+
+11. Storage of previous navigation points include the diagram
+
+   - This is very important for being able to back out of a diagram elaboration that is too complex
+
+12. Storage of trajectories through the navigation space
+
+  - Also storage of particular points is usefull
+
+13. File format
+
+  - currently diagrams are based on meet irreducibles, so storing the diagram 
+    requires also storing the lattice.
+
+  - some sort of hierarchical format that supports references at least
+    locally is usefull.
+
+    - tones of small files is a bad news, really some sort of BTree is
+      required.
+
+    - that could support nodes having uid's and being retrievable. A
+      notion of containment would also allow quick recovery of the
+      children (maybe a lot of seeking but this is perhaps not so bad
+      if it is pushed down into the database layer).
+
++++ Todo List (Half finished stuff)
+
+1. This Todo List
+
+   - requires constant updating
+
+2. Diagram Metrics 
+
+   - presently only half the metrics have been implemented and non of
+     them have been tested.

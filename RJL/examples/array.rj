@@ -1,0 +1,144 @@
+# @class Array
+#   Array is implemented as a class because it has an
+#   associated implementation. It also conformed to several
+#   interfaces
+#
+#   This class demonstrates the following language features:
+#     - comments (See CommentsFormat)
+#     - class definitions
+#     - calling c functions
+#     - definitions of function semantics
+#
+#   Implicit in the definition of this class are the following concepts:
+#     - interface definitions
+#
+#   @SeeAlso DynamicTypingAndTypeInference
+
+class 'a Array
+  implements MutableSequence
+
+  c_struct {
+    size_t length;
+    size_t data_length;
+    rj_ref_t* data;
+  }
+
+  # @def ensure_capacity(new_size)
+  #
+  #   Resizes the array so that it has at least &new_size elements
+  #
+  #   @throws MaxArrayLengthExceeded if new_size is larger than the
+  #   array size
+  #
+  #   @throws OutOfMemory if malloc returns 0 when trying to allocate
+  #   the new array
+  #
+  #   If an exception is raised then the array will be unchanged
+
+  def ensure_capacity(new_size: Int): Unit
+    scope private
+    extern "C" { 
+      if ( new_size < self->data_length ) {
+        if ( self->length < new_size ) {
+          self->length = new_size;
+        }
+      }
+      else {
+        int new_data_length = self->data_length;
+        while( new_size >= new_data_length ) {
+          if ( new_data_length > (rj_max_int / 2) ) {
+            rj_raise_exception(rj_get_class("MaxArrayLengthExceeded"))
+          }
+          new_data_length *= 2;
+        }
+        rj_ref_t* new_data = 
+          (rj_ref_t*)malloc(sizeof(rj_ref_data)*new_data_len);
+        if (new_data == 0) {
+          rj_raise_exception(rj_get_class("OutOfMemory"))
+        }
+        for(i=0;i<self->length;++i) {
+          new_data[i] = self->data[i];
+        }
+        for(;i<new_data_length;++i) {
+          new_data[i] = rj_ref_nil;
+        }
+        free(self->data);
+        self->data_length = new_data_length;
+        self->data = new_data;
+      }
+    }
+  end
+
+  def initialize()
+    extern "C" {
+      int i;
+      self->length = 0;
+      self->data_length = 10;
+      self->data = (rj_ref_t *)malloc(self->data_length * (sizeof)(rj_ref_t));
+      for(i=0;i<self->data_length;++i) {
+        self->data[i] = rj_ref_nil;
+      }
+    }
+  end
+
+  def each(block: Unit Block): Unit
+    semantics sequence_enumerator
+    extern "C" { 
+      int i;
+      for(i=0;i<self->length;++i) {
+        rj_block_call_1(block, self->data[i])
+      }
+    }
+  end
+
+  def push(item: 'a): Unit
+    semantics sequence_insert_last
+    extern "C" {
+      int i;
+      if (length+1 < data_length) {
+        self->data[i] = item;
+        ++(self->length);
+      }
+      else {
+        rj_call_method_1(self, "ensure_capacity", length+1);
+        self->data[i] = item;
+        ++(self->length);
+      }
+    }
+  end
+
+  def pop(item: 'a): Unit
+    semantics sequence_remove_last
+    throws "SequenceNotEmpty"
+    extern "C" {
+      if ( self->length > 0 ) {
+        --self->length;
+      }
+      else {
+        rj_raise_exception(rj_get_class("SequenceNotEmpty"))
+      }
+    }
+  end
+
+  def empty(): Bool
+    semantics sequence_is_empty
+    extern "C" {
+      return self->length == 0;
+    }
+  end
+
+  def [](index: Int): 'a
+    semantics sequence_nth
+    extern "C" {
+      rj_call_method(self, "ensure_capacity", index);
+      return &(self->data[index]);
+    }
+  end
+
+  def count(): Int
+    semantics sequence_count
+    extern "C" {
+      return self->length;
+    }
+  end
+end

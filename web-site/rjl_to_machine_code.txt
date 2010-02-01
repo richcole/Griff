@@ -1,0 +1,165 @@
++++ RJL To Machine Code
+
+Consider the following generic function.
+
+---
+  def sum(range : 'a Iterable, func: 'a -> 'b Sumable, x: 'b = 0.0): 'b
+    range.each { y | x += func(y) }
+    return x
+  end
+
+  result = sum 1..n, { x | x * x }
+---
+
+First lets consider that the function can be unrolled because the
+method sum does not involve a virtual dispatch.
+
+--- 
+  x = 0.0
+  (1..n).each { y | x += y * y }
+  result = x
+---
+
+Now since the type of 1..n is exactly known we can infer the each
+method, but what is its definition.
+
+---
+  def each block
+    i = start
+    while i <= end do
+      block.call
+      i += 1
+    end
+  end
+---
+
+But the block is known and can be unrolled also.
+
+---
+  def each block
+    i = start
+    while i <= end do
+      x += i * i
+      i += 1
+    end
+  end
+---
+
+But x needs to be passed into the function, this could be done
+potentially by an enclosing scope reference.
+
+---
+  def each block, enclosing_scope
+    i = self.start
+    while i <= self.end do
+      enclosing_scope.x += i * i
+      i += 1
+    end
+  end
+---
+
+Now inline this code back in the original and we get the following.
+
+---
+  x = 0.0
+  r = alloc Range
+  r.start = 1
+  r.end = n
+  i = start
+  while i <= r.end do
+    enclosing_scope.x += i * i
+    i += 1
+  end
+  result = enclosing_scope.x
+---
+
+There is a problem though. The optimiser must choose when to inline
+code and when not to inline code. Given a complex program the best
+parts to unroll might not always be clear. One option is to allow the
+user to give hints by adding inline attributes. Another is to inline
+any function that takes a block that is constructed at compile
+time. E.g. the following code would not be inlines because the block
+is not immediately available.
+
+---
+  class Button
+    def process(event)
+      case event.class
+        when Click
+          self.on_click.call
+        default
+          nil # ignore event
+      end
+    end
+  end
+
+  button = Button.new
+  button.on_click = { button | puts "Button Clicked." }
+---
+
+In this case the block being accessed is not passed to the function.
+ 
+++++ LLVM What can it do
+
+I was quite supprised that LLVM was able to completely optimise the code that I entered. It unfolded the loop and calculated the result of the computation of the following code at compile times.
+
+---
+struct Range {
+  int start;
+  int end;
+};
+
+struct Env {
+  int x;
+};
+
+void times(int x, struct Env *env) {
+  env->x += x * x;
+};
+
+void each(struct Range *range,  void (*times_ptr)(int x, struct Env *env), struct Env *env)
+{
+  int i = range->start;
+  while(i <= range->end) {
+    (*times_ptr)(i, env);
+    i += 1;
+  }
+}
+
+int main()
+{
+  struct Range r   = { 1, 10 };
+  struct Env   env = { 0 };
+  each(&r, &times, &env);
+  return env.x;
+};
+---
+
+Produced the following output.
+
+---
+; ModuleID = '/tmp/webcompile/_2829_0.bc'
+target endian = little
+target pointersize = 32
+target triple = "i686-pc-linux-gnu"
+deplibs = [ "c", "crtend" ]
+	%struct.Env = type { int }
+	%struct.Range = type { int, int }
+
+implementation   ; Functions:
+
+int %main() {
+each.exit:
+	call void %__main( )
+	ret int 385
+}
+
+declare void %__main()
+---
+
+You can see that the result of the each function has been computed at
+compile time.
+
+
+
+

@@ -1,0 +1,33 @@
+proceedings:
+  id: sigir99proceedings 
+  type: conference proceedings
+  title: "Proceedings of the 22nd ACM SIGIR'99 Conference"
+  year: 1999
+
+paper: 
+  id: ding99similarity 
+  type: paper in conference proceedings
+  title: A probabilisitic interpretation of SVD
+  local file: ding_similarity_svd.ps
+  keywords: 
+    singular value decomposition, probabilisitic models,
+    document similarity
+  quality judgement:
+    author: rj
+    judgements: well written, reasonable references, important paper
+  published:
+    in: sigir99proceedings
+    pages: 59-65
+  comment:
+    author: rj
+    text:
+      Ding provides a probabilisitic model for latent semantic analysis. His
+      major contribution is to describe the probability of a document as
+      being related to the length of the document when projected in the 
+      reduced space.
+  last edited: 22-07-04
+
+paper:
+  id: rosario02descent
+  title: the descent of hierarchy
+

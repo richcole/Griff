@@ -1,0 +1,21 @@
+RJ_CAML - 
+  Richard Cole, Copyright 2004
+
+This is a small library of useful Ocaml data structures such as bitsets,
+trees, tries etc.
+
+For license information see COPYING
+
+There is no configuration required.
+
+The library depends on, for compilation and installation, 
+a working installation of GODI (http://http://godi.ocaml-programming.de/)
+
+To compile:
+  make
+
+To install:
+  make install
+
+
+

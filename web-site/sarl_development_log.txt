@@ -1,0 +1,68 @@
++++ Sarl Development Log
+
+++++ Recent Additions
+
+  - Revamp of the build System: The build system has been split up so
+    that it generates dependencies in an initial step before then
+    loading the makefile the loads the code. Some options were moved
+    from a build.tcl file to build_config.txt so that they could
+    potentially be edited by a ./configure program if one were
+    created.
+
+  - Sat Solver: A sat solver has been added to sarl including a number of 
+    command line executables. Of most interested are: 
+
+       min_unsat.exe prune_clauses.exe reduce_clauses.exe sarl_sat_main.exe
+
+    These programs solve the SAT and min-UNSAT problems. Implementing well 
+    documented algorithms from the literature.
+
+  - Psudo-Intents and the Stem Base: Ganter's algorithm for the
+    computation of the stem-base for attribute implications of a
+    formal context has been added to Sarl. See the program
+    sarl_implication_set_test.cpp for an example of how to use the algorithm.
+
+++++ What are the most needed features
+
+Following is a list of the most needed features for browsing 
+software structure. This is really related to CASS.
+
+   - Back button: To do well this really requires storing diagrams as
+     well. Perhaps this is not too hard to do at the Ruby layer. It
+     simply requires storing the diagrams on each navigation step.
+
+   - Complete the naviagtion operations: So far not all the navigation
+     operations are provided.
+
+   - Create a druid or some such for analysing additional jar files.
+     
+
+++++ Adding Scrolling Labels
+
+   I have added basic infra structure to draw scrollbars on labels
+   when they are active. 
+
+   The labels can currently be resized but currently can't be scrolled
+   either up or down. The minimum size for a label is way too small.
+
+     - change the minimum size for a label to be three lines
+     - add scroll up and scroll down functions
+     - modify the drawing code to draw from the current offset
+     - modify the drawing code to add "n more before" and "n more below" if 
+       neccessary
+
+  Also linked to this page are the notes on [Sarl Scrolling
+  Labels][sarl3_scrolling_labels.html].
+
+  Label scrolling now works in a basic way. The arrows in the
+  scrollbars work and you get "n before" and "n after" text when the
+  label is scrolled. However there are still issues:
+
+     - the buttons don't limit the scroll range properly
+     - the label minimum size is too small
+
+  A redesign of the label system is in order to fix these
+  problems. Particularly since the font metrics coming from Pango make
+  it rather easy to figure out the size of the text.
+
+   

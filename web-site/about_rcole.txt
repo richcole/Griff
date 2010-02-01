@@ -1,0 +1,27 @@
++++ About Richard Cole
+
+<<richard.jpg|right>>
+
+Richard Cole is a research fellow at the University of Queensland. He
+is interested in programming languages and formal concept analysis.
+
+In 1996 Richard was awarded the title of Bachelor Science with first
+class honours in Computer Science from the University of
+Adelaide. Richard was also awarded the DEC Honours prize for Computer
+Science. In 1997 Richard was awarded the title of Bachelor of
+Engineering with first class honours in Computer System
+Engineering. Shortly after commencing his PhD Richard was award a
+prestigious DAAD scholarship and spent 6 months working with
+Prof. Wille's research group (AG1) in Darmstadt. After returning from
+Germany Richard followed the move of Peter Eklund's KVO group from the
+University of Adelaide to Griffith University where he was awarded a
+Doctor of Philosophy in 2001 for a thesis entitled "Document
+Management Using Formal Concept Analysis". After completing his PhD,
+Richard worked for a year and half at Boeing Australia on the High
+Frequency Modernisation Project before returning to Peter Eklund's KVO
+group to take up a Research fellowship working with Peter Eklund and
+Peter Bruza on the application of semantic spaces and formal concept
+analysis to document organisation. Richard also has an active interest
+in the application of FCA to software engineering.
+
+
