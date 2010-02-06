@@ -1,9 +1,35 @@
-To install you need the following debian testing packages installed.
+1. Install dependencies
 
- sudo apt-get install tcl8.4 ruby1.8-dev tclsh g++ gtk2.0-dev gc-dev
+  $ sudo apt-get install tcl8.4 ruby1.8-dev tclsh g++ gtk2.0-dev gc-dev \
+      libgc1c2 libgc-dev libglib2.0-dev \
+      libgtk2.0-dev ruby-dev libglib2-ruby1.8 ruby-gnome2 ruby-gnome2-dev
 
-The process is then make; make install. If this doesn't work the first
-port of call is build_config.txt which contains some variables which
-can be set.
+There may be other missing dependencies that I already had installed
+on my machine.
+
+2. Building
+
+  $ cd sarl3
+  $ make
+  
+3. Testing
+
+This is a test of the Gtk widget for displaying lattices
+
+  $ LD_LIBRARY_PATH=. ./sarl_lattice_view_gtk_test.exe
+
+This is a simple lattice viewer from the ruby framework. It can draw
+lattices of contexts in Beurmeister format.
+
+  $ cd ruby && LD_LIBRARY_PATH=.:.. ruby lattice_viewer_app.rb
+
+There's an example file b4.cxt.
+
+The Sarl library was used mostly for my experiments. If you also
+install Mulgara then you can use the software analysis stuff which
+includes an implementation of the idea of Navigation spaces.
+
+The Navigation space viewer requires the Ruby Java Bridge to talk to
+Mulgara which is written in java http://rjb.rubyforge.org/
 
 

@@ -28,22 +28,22 @@ set sarl(cppsources) {
 }
 
 set sarl(rubylib) sarlrb 
-set sarl(ldflags)  "-L. -L.. -L/usr/local/lib -lpthread -ldl -lcrypt -lm -lc -lsarl -L/mnt/debian-mount/usr/local/lib"
-set sarl(cppflags) "-I. -I.. -I/usr/lib/ruby/1.8/i486-linux/ -I/usr/lib/ruby/1.8/i386-linux -I/mnt/debian-mount/usr/local/include/sarl"
+set sarl(ldflags)  "-L. -L.. -L/usr/local/lib -lpthread -ldl -lcrypt -lm -lc -lsarl "
+set sarl(cppflags) "-I. -I.. -I/usr/lib/ruby/1.8/i486-linux/ -I/usr/lib/ruby/1.8/i386-linux"
 
 # ----------------------------------------------------------------------
 # Gtk
 #
 
-set gtk(cppsources) {
+set sarlgtk(cppsources) {
     sarl_gtk_rb 
     sarl_lattice_view_gtk_rb
 }
 
-set gtk(ldflags)  "`pkg-config --libs gtk+-2.0` -lpthread -ldl -lcrypt -lm -lc -L. -L.. -L/usr/local/lib -lsarl -lsarlgtk -L/mnt/debian-mount/usr/local/lib"
-set gtk(cppflags) "-I. -I.. `pkg-config --cflags gtk+-2.0` -I/usr/lib/ruby/1.8/i486-linux/ -I/usr/lib/ruby/1.8/i386-linux/ -I/mnt/debian-mount/usr/local/include/sarl"
+set sarlgtk(ldflags)  "`pkg-config --libs gtk+-2.0` -lpthread -ldl -lcrypt -lm -lc -L. -L.. -L/usr/local/lib -lsarl -lsarlgtk"
+set sarlgtk(cppflags) "-I. -I.. `pkg-config --cflags gtk+-2.0` -I/usr/lib/ruby/1.8/i486-linux/ -I/usr/lib/ruby/1.8/i386-linux/"
 
-set gtk(rubylib) sarlrbgtk
+set sarlgtk(rubylib) sarlrbgtk
 
 
 

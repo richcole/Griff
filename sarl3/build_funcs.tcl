@@ -37,7 +37,6 @@ proc cpp_compile { s x } {
     puts "$s.o: $s.cpp"
     puts "\t$ccc -c [get $x cppflags] [get global cppflags] -o $s.o $s.cpp"
     puts ""
-    
 }
 
 proc cpp_deps { s x } {
